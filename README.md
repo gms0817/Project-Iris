@@ -1,5 +1,8 @@
-### v2.0.0-alpha
+### v2.0.1-alpha
 In this version of **Project Iris** we have rebuilt the original source code in order to provide a friendly user interface.
+
+### Patch Notes:
+- Tweaked 'User Exists" method to fix a bug where new files would be created but the program would crash.
 
 ### Current GUI features include the following:
 - Resizable window
