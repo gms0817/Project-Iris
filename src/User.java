@@ -144,21 +144,24 @@ public class User {
 	public boolean userExists() {
 		boolean exists = false;
 		File userExists = new File("user/user_exists.txt");
+		
 		if(userExists.exists()) {
 			try {
+				String temp = "";
 				Scanner myReader = new Scanner(userExists);
-				String temp = myReader.nextLine();
+				while(myReader.hasNextLine())  { 
+					temp = myReader.nextLine();
+				}
 				if(userExists.exists() && temp.isBlank() == false)
 					exists = true;
 				else {
 					createFiles();
-					exists = true;
+					exists = false;
 				}
-
+				myReader.close();
 			} catch(FileNotFoundException e) {
 				e.printStackTrace();
 			}
-
 		}
 		else
 			createFiles();
