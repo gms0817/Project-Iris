@@ -974,6 +974,7 @@ public class Iris implements ActionListener {
 		dialogue[22][0] = "when were you born";
 		dialogue[22][1] = "I was born on October 26th, 2021";
 
+		// v2.1.0 -----
 		// #11 - how old is the ai
 		dialogue[23][0] = "old are you";
 		dialogue[23][1] = "I am " + getAiAge() + " years old.";
