@@ -4,16 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="54b2e0b8-4728-4d98-a88e-f67f8c9505ec" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/.idea/Project-Iris.iml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/.gitignore" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/Iris.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/Iris.iml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/inspectionProfiles/profiles_settings.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/modules.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/vcs.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/iris.py" beforeDir="false" afterPath="$PROJECT_DIR$/iris.py" afterDir="false" />
-    </list>
+    <list default="true" id="54b2e0b8-4728-4d98-a88e-f67f8c9505ec" name="Changes" comment="v3.0.0-alpha&#10;Added TTS and STT and a basic GUI" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -78,6 +69,14 @@
       <option name="presentableId" value="Default" />
       <updated>1666904335386</updated>
     </task>
+    <task id="LOCAL-00001" summary="v3.0.0-alpha&#10;Added TTS and STT and a basic GUI">
+      <created>1666917304948</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1666917304948</updated>
+    </task>
+    <option name="localTasksCounter" value="2" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -105,5 +104,7 @@
   </component>
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
+    <MESSAGE value="v3.0.0-alpha&#10;Added TTS and STT and a basic GUI" />
+    <option name="LAST_COMMIT_MESSAGE" value="v3.0.0-alpha&#10;Added TTS and STT and a basic GUI" />
   </component>
 </project>
