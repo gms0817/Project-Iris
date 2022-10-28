@@ -284,14 +284,11 @@ def build_gui():
     # Sun Valley TTK Theme by rdbende
     sv_ttk.set_theme("dark")
 
-    # Load user or create one if needed
+    # Load user, create new one if needed
     load_user("user.pickle")
 
     # Keeps window visible on the screen until program is closed
     root.mainloop()
-
-    # Load user, create new one if needed
-
 
 # ------------------------------------------------------------------------
 # Main Function and Program Direction to Main
