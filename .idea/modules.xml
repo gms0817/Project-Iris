@@ -2,8 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/Iris.iml" filepath="$PROJECT_DIR$/.idea/Iris.iml" />
-      <module fileurl="file://$PROJECT_DIR$/../Project-Iris/.idea/Project-Iris.iml" filepath="$PROJECT_DIR$/../Project-Iris/.idea/Project-Iris.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/Project-Iris.iml" filepath="$PROJECT_DIR$/.idea/Project-Iris.iml" />
     </modules>
   </component>
 </project>

@@ -1,26 +1,103 @@
 # Import Statements
+import os
 import tkinter as tk
 from tkinter import *
+import numpy as np
+import speech_recognition as sr
 import pyttsx3
+import transformers
+import tensorflow
 
 # -----------------------------------------------------------------------
-# Setup Variables and Tweaks
+# Setup Global-scope Variables
+global output
+global output_label
+global input_field
+global iris
+global engine
 engine = pyttsx3.init()
 
+
 # -----------------------------------------------------------------------
+
+class ChatBotAI():
+    # Setup / Customize TTS Engine)
+    engine.setProperty("rate", 185)
+    voices = engine.getProperty('voices')
+    engine.setProperty('voice', voices[1].id)  # voices[0] == male, voices[1] == female
+
+    def __init__(self, name):
+        print("---Loading ", name, "---")
+        self.name = name
+
+    def wake_up(self, text):
+        return True if self.name in text.lower() else False
+
+    def speech_to_text(self):
+        recognizer = sr.Recognizer()
+        with sr.Microphone() as mic:
+            print("listening...")
+            audio = recognizer.listen(mic)
+        try:
+            self.text = recognizer.recognize_google(audio)
+            print("me --> ", self.text)
+            set_output_text_voice(self.text)
+        except:
+            print("me --> ERROR")
+
+    @staticmethod
+    def text_to_speech(text):
+        global engine
+        print("AI --> ", text)
+        engine.say(text)
+        engine.runAndWait()
 
 
 def get_response(input_text):
-    return input_text
+    global iris
     print(input_text)
+    iris.text_to_speech(input_text)
+    return input_text
 
 
 def set_output_text():
-    output = output_label.config(text=get_response(input_field.get()))
+    # Global Variables
+    global output_label
+    global input_field
+    output_label.config(text=get_response(input_field.get()))
     input_field.delete(0, 'end')  # Empty the input field
 
 
+def set_output_text_voice(speech):
+    # Global Variables
+    global output_label
+    global input_field
+    output_label.config(text=get_response(speech))
+    input_field.delete(0, 'end')  # Empty the input field
+
+
+def set_output_text_key(self):
+    # Global Variables
+    global output_label
+    global input_field
+
+    output_label.config(text=get_response(input_field.get()))
+    input_field.delete(0, 'end')  # Empty the input field
+
+
+def toggle_stt():
+    # Global Variables
+    global iris
+
+    iris.speech_to_text()
+
+
 def build_gui():
+    # Global Variables
+    global output
+    global output_label
+    global input_field
+
     # Build the user interface
     # Create instance of tk.Tk class to create application window
     root = tk.Tk()  # Main Window
@@ -45,7 +122,7 @@ def build_gui():
     header_frame = Frame(root, bg="black", width=window_width, height=window_height - 200)
     header_frame.pack(anchor=N, fill=X, expand=TRUE)
 
-    body_frame = Frame(root, bg="gray", width=window_width, height=window_height - 400)
+    body_frame = Frame(root, width=window_width, height=window_height - 400)
     body_frame.pack(anchor=CENTER, fill=X, expand=TRUE)
 
     footer_frame = Frame(root, bg="black", width=window_width, height=window_height - 200)
@@ -59,41 +136,38 @@ def build_gui():
     home_button.grid(row=0, column=0, padx=10, pady=10)
 
     # Add label to display output
-    global output
     output = "Hi, my name is Iris. How may I help you?"
-    global output_label
+
     output_label = tk.Label(body_frame, text=output, font=("Arial", 20), padx=10, pady=10)
     output_label.pack()
 
     # Add text box to collect user input
-    global input_field
-    input_field= tk.Entry(input_frame)
+    input_field = tk.Entry(input_frame)
     input_field.focus()  # Window will autofocus on Entry widget
-    input_field.pack(side=LEFT,padx=10, pady=10)
+    input_field.pack(side=LEFT, padx=10, pady=10)
 
-    root.bind('<Return>', set_output_text)
+    input_field.bind('<Return>', set_output_text_key)
 
     # Add button to submit user input for processing
     submit_button = tk.Button(input_frame, text="Submit", command=set_output_text)
     submit_button.pack(side=RIGHT, padx=10, pady=10)
 
+    # Add toggle to turn on voice recognition
+    stt_is_on = True
+    stt_button = tk.Button(input_frame, text="STT", command=toggle_stt)
+    stt_button.pack(side=RIGHT, padx=10, pady=10)
+
     # Keeps window visible on the screen until program is closed
     root.mainloop()
 
 
-
-def setup_tts():
-    # Customize TTS Engine
-    engine.setProperty("rate", 185)
-    voices = engine.getProperty('voices')
-    engine.setProperty('voice', voices[1].id) # voices[0] == male, voices[1] == female
-
-
 def main():
-    setup_tts()
+    # Global Variables
+    global iris
+    # Instantiate Iris AI Chatbot
+    iris = ChatBotAI(name="Iris")
+
     build_gui()
-    engine.say(output)
-    engine.runAndWait()  # Speak all queued text
 
 
 # Call the main function
