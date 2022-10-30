@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="2ac673d0-b9a2-4462-9dc3-7f0ff459e080" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/inspectionProfiles/profiles_settings.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/inspectionProfiles/profiles_settings.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Checkout_at_10_27_2022_5_05_PM__Changes_.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Checkout_at_10_27_2022_5_05_PM__Changes_.xml" afterDir="false" />
+    <list default="true" id="2ac673d0-b9a2-4462-9dc3-7f0ff459e080" name="Changes" comment="Adjust new user popup and added responses">
+      <change beforePath="$PROJECT_DIR$/.idea/Project-Iris.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/Project-Iris.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/iris.py" beforeDir="false" afterPath="$PROJECT_DIR$/iris.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/iris.py" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -24,6 +24,9 @@
     <option name="stateVersion" value="1" />
   </component>
   <component name="ProjectId" id="2Gk7At0qLhZaRPB82pW3pO1cAF4" />
+  <component name="ProjectLevelVcsManager">
+    <ConfirmationsSetting value="2" id="Add" />
+  </component>
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
@@ -32,7 +35,8 @@
   &quot;keyToString&quot;: {
     &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
     &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable&quot;
+    &quot;last_opened_file_path&quot;: &quot;C:/Users/gabri/My Drive/Programming/Python/Project-Iris&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.editor&quot;
   }
 }</component>
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
@@ -44,6 +48,14 @@
       <option name="presentableId" value="Default" />
       <updated>1666920587408</updated>
     </task>
+    <task id="LOCAL-00001" summary="Adjust new user popup and added responses">
+      <created>1667163803839</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1667163803839</updated>
+    </task>
+    <option name="localTasksCounter" value="2" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -56,5 +68,9 @@
         </entry>
       </map>
     </option>
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="Adjust new user popup and added responses" />
+    <option name="LAST_COMMIT_MESSAGE" value="Adjust new user popup and added responses" />
   </component>
 </project>
