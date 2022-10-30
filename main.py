@@ -52,16 +52,21 @@ def toggle_stt():
 
 
 def get_response(input_text):
+    input_text = input_text.lower()
     print("get_response(): " + input_text)
     # -----------------------------------------------------------------------
     # Pre-Defined Responses
     if "time" in input_text:
         return get_time()
+    # Use to Debug/Test TTS Pronounciation
+    elif "@say " in input_text:
+        return input_text[4:]
     # Thanks / Appreciation to Iris
     elif "thank" in input_text:
         return np.random.choice(["No problem!",
                                  "You're welcome!",
-                                 "Anytime!", "I'm here if you need me!"])
+                                 "Anytime!", "I'm here if you need me!",
+                                 "It is my duty to serve you."])
     # Hello
     elif "hello" in input_text or "hi" in input_text or "hey" in input_text or "what's up" in input_text:
         return np.random.choice(["Hi, It is good to see you again!",
@@ -94,7 +99,7 @@ def get_response(input_text):
     elif "your name" in input_text or "who are you" in input_text:
         return "My name is Iris, and I am your personal assistant!"
     # What is the user's name
-    elif "my name" in input_text:
+    elif "my name" in input_text or "who am i" in input_text:
         return "Your name is " + user_obj.user_name + "."
     # What is the user's birthday
     elif "my birthday" in input_text or "i born" in input_text:
@@ -102,7 +107,6 @@ def get_response(input_text):
     # What is the user's age
     elif "old am i" in input_text or "my age" in input_text:
         return "You are " + str(user_obj.user_age) + " years old."
-
     # How to Spell
     elif "spell" in input_text:
         start_of_word = input_text.rindex("spell") + 6
@@ -150,7 +154,7 @@ def parse_results(response):
     # Store top results
     results = response.html.find(css_identifier_result)
 
-    top_result = results[0]  # Isolate the first result
+    top_result = results[2]  # Isolate the first result
 
     result_title = top_result.find(css_identifier_title, first=True).text
     result_text = top_result.find(css_identifier_text, first=True).text
@@ -159,9 +163,6 @@ def parse_results(response):
     # top_result.find(css_identifier_title, first=True).text
     # top_result.find(css_identifier_link, first=True).attrs['href']
     # top_result.find(css_identifier_text, first=True).text
-
-    # Trim the output
-    period_index = output.index('.')
 
     return output
 
