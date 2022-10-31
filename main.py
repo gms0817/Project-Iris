@@ -35,6 +35,38 @@ def spell_word(input_text):
     return output.capitalize()
 
 
+def get_zodiac():
+    dob = datetime.strptime(user_obj.user_dob, "%Y-%m-%d")
+    birth_month = dob.month
+    birth_day = dob.day
+
+    if birth_month == 12:
+        astro_sign = 'Sagittarius' if (birth_day < 22) else 'Capricorn'
+    elif birth_month == 1:
+        astro_sign = 'Capricorn' if (birth_day < 20) else 'Aquarius'
+    elif birth_month == 2:
+        astro_sign = 'Aquarius' if (birth_day < 19) else 'Pisces'
+    elif birth_month == 3:
+        astro_sign = 'Pisces' if (birth_day < 21) else 'Aries'
+    elif birth_month == 4:
+        astro_sign = 'Aries' if (birth_day < 20) else 'Taurus'
+    elif birth_month == 5:
+        astro_sign = 'Taurus' if (birth_day < 21) else 'Gemini'
+    elif birth_month == 6:
+        astro_sign = 'Gemini' if (birth_day < 21) else 'Cancer'
+    elif birth_month == 7:
+        astro_sign = 'Cancer' if (birth_day < 23) else 'Leo'
+    elif birth_month == 8:
+        astro_sign = 'Leo' if (birth_day < 23) else 'Virgo'
+    elif birth_month == 9:
+        astro_sign = 'Virgo' if (birth_day < 23) else 'Libra'
+    elif birth_month == 10:
+        astro_sign = 'Libra' if (birth_day < 23) else 'Scorpio'
+    elif birth_month == 11:
+        astro_sign = 'Scorpio' if (birth_day < 22) else 'Sagittarius'
+    return astro_sign
+
+
 def get_time():
     now = datetime.now()
     current_time = now.strftime("%H:%M:%S")
@@ -47,6 +79,7 @@ def calculate_age(dob):
     return age
 
 
+# Enables speech recognition and translates speech into text
 def toggle_stt():
     speech_to_text()
 
@@ -98,6 +131,22 @@ def get_response(input_text):
     # Iris' Name
     elif "your name" in input_text or "who are you" in input_text:
         return "My name is Iris, and I am your personal assistant!"
+    # Iris' Birthday
+    elif "your birthday" in input_text or "when were you" in input_text:
+        return "I was born on October 21st, 2021."
+    # Iris' Age
+    elif "old are you" in input_text or "your age" in input_text or "old you are" in input_text:
+        # Calculate Age from DOB
+        year = 2021
+        month = 10
+        day = 21
+        return "I am " + str(calculate_age(date(year, month, day))) + " year(s) old."
+    # Iris' Zodiac
+    elif "your zodiac" in input_text or "your star sign" in input_text:
+        return "I am a Libra."
+    # Iris' Creator
+    elif "made you" in input_text or "created you" in input_text or "developed you" in input_text or "your creater" in input_text:
+        return "I was created by Gabriel Serrano."
     # What is the user's name
     elif "my name" in input_text or "who am i" in input_text:
         return "Your name is " + user_obj.user_name + "."
@@ -107,6 +156,9 @@ def get_response(input_text):
     # What is the user's age
     elif "old am i" in input_text or "my age" in input_text:
         return "You are " + str(user_obj.user_age) + " years old."
+    # What is the users zodiac sign
+    elif "my zodiac" in input_text or "my star sign" in input_text:
+        return "Your Zodiac sign is '" + get_zodiac() + "'."
     # How to Spell
     elif "spell" in input_text:
         start_of_word = input_text.rindex("spell") + 6
