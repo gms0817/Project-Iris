@@ -1,7 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="2ac673d0-b9a2-4462-9dc3-7f0ff459e080" name="Changes" comment="-Added Sun Valley TTK Theme by rdbende for a more modern feel/appearance&#10;-added a few basic responses based on user input&#10;-began working on checking if a user exists and creating a user if needed.&#10;-Planning to add responses about weather and the user based on information given.&#10;-implemented ability to create user and save their data to an encrypted file" />
+    <list default="true" id="2ac673d0-b9a2-4462-9dc3-7f0ff459e080" name="Changes" comment="-Added Sun Valley TTK Theme by rdbende for a more modern feel/appearance&#10;-added a few basic responses based on user input&#10;-began working on checking if a user exists and creating a user if needed.&#10;-Planning to add responses about weather and the user based on information given.&#10;-implemented ability to create user and save their data to an encrypted file">
+      <change beforePath="$PROJECT_DIR$/.idea/Project-Iris.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/Project-Iris.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/vcs.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -15,21 +22,29 @@
     </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
+  <component name="GithubProjectSettings">
+    <option name="branchProtectionPatterns">
+      <list>
+        <option value="master" />
+      </list>
+    </option>
+  </component>
   <component name="MarkdownSettingsMigration">
     <option name="stateVersion" value="1" />
   </component>
   <component name="ProjectId" id="2Gk7At0qLhZaRPB82pW3pO1cAF4" />
+  <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "RunOnceActivity.OpenProjectViewOnStart": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "settings.editor.selected.configurable": "project.propVCSSupport.DirectoryMappings"
   }
-}</component>
+}]]></component>
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="TaskManager">
     <task active="true" id="Default" summary="Default task">
@@ -68,6 +83,9 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
+    <ignored-roots>
+      <path value="$PROJECT_DIR$/.idea" />
+    </ignored-roots>
     <MESSAGE value="-Added Sun Valley TTK Theme by rdbende for a more modern feel/appearance&#10;-added a few basic responses based on user input&#10;-began working on checking if a user exists and creating a user if needed.&#10;-Planning to add responses about weather and the user based on information given.&#10;-implemented ability to create user and save their data to an encrypted file" />
     <option name="LAST_COMMIT_MESSAGE" value="-Added Sun Valley TTK Theme by rdbende for a more modern feel/appearance&#10;-added a few basic responses based on user input&#10;-began working on checking if a user exists and creating a user if needed.&#10;-Planning to add responses about weather and the user based on information given.&#10;-implemented ability to create user and save their data to an encrypted file" />
   </component>

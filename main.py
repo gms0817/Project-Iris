@@ -1,6 +1,7 @@
 # -----------------------------------------------------------------------
 # Imports
 import pickle
+import threading
 import tkinter as tk
 import urllib
 import requests.exceptions
@@ -9,20 +10,47 @@ import speech_recognition as sr
 import pyttsx3
 import numpy as np
 import user
+import queue
 from tkinter import ttk
 from datetime import datetime
 from datetime import date
-from requests_html import HTML
-from requests_html import HTMLSession
+# from requests_html import HTML
+# from requests_html import HTMLSession
 from multiprocessing import Process
+from threading import Thread
 
 # -----------------------------------------------------------------------
-# Setup / Customize TTS Engine
+# Setup / Customize TTS Engine Class
+global voice_option
 voice_option = 1
-engine = pyttsx3.init()
-engine.setProperty("rate", 185)
-voices = engine.getProperty('voices')
-engine.setProperty('voice', voices[voice_option].id)  # voices[0] == male, voices[1] == female
+
+
+class TTSThread(threading.Thread):
+
+    def __init__(self, queue):
+        threading.Thread.__init__(self)
+        self.queue = queue
+        self.daemon = True
+        self.start()
+
+    def run(self):
+        global voice_option
+        engine = pyttsx3.init()
+        engine.setProperty("rate", 185)
+        engine.startLoop(False)
+        voices = engine.getProperty('voices')
+        engine.setProperty('voice', voices[voice_option].id)  # voices[0] == male, voices[1] == female
+        thread_running = True
+        while thread_running:
+            if self.queue.empty():
+                engine.iterate()
+            else:
+                data = self.queue.get()
+                if data == "exit":
+                    thread_running = False
+                else:
+                    engine.say(data)
+        engine.endLoop()
 
 
 # -----------------------------------------------------------------------
@@ -225,11 +253,6 @@ def google_search(query):
 
 
 # -----------------------------------------------------------------------
-def text_to_speech(text):
-    engine.say(text)
-    engine.runAndWait()
-
-
 def speech_to_text():
     recognizer = sr.Recognizer()
     with sr.Microphone() as mic:
@@ -239,11 +262,13 @@ def speech_to_text():
         text = recognizer.recognize_google(audio)
         print("me --> ", text)
         set_output_text_voice(text)
+        tts_queue.put(output)
     except Exception as e:
         print(e)
 
 
 def switch_tts_voice(option):
+    global voice_option
     voice_option = option
     print(voice_option)
     engine.setProperty('voice', voices[voice_option].id)  # voices[0] == male, voices[1] == female
@@ -254,23 +279,23 @@ def switch_tts_voice(option):
 def set_output_text():
     output = get_response(input_field.get())
     output_label.config(text=output)
-    text_to_speech(output)
     input_field.delete(0, 'end')  # Empty the input field
+    tts_queue.put(output)
 
 
 def set_output_text_voice(input_text):
     output = get_response(input_text)
     print("set_output_text_voice: " + output)
     output_label.config(text=output)
-    text_to_speech(output)
     input_field.delete(0, 'end')  # Empty the input field
+    tts_queue.put(output)
 
 
 def set_output_text_key(self):
     output = get_response(input_field.get())
     output_label.config(text=output)
-    text_to_speech(output)
     input_field.delete(0, 'end')  # Empty the input field
+    tts_queue.put(output)
 
 
 def new_user_popup():
@@ -345,7 +370,7 @@ def new_user_popup():
             save_user(user_obj)  # Save user as an object to a pickle file
             output = "It is nice to meet you, " + user_obj.user_name + ". How may I help you?"
             output_label.config(text=output)
-            text_to_speech(output)
+
             close_new_user_popup()
 
             """ Use to debub user_obj 
@@ -371,7 +396,7 @@ def load_user(filename):
             user_obj = pickle.load(f)
             output = "Welcome back, " + user_obj.user_name + "."
             output_label.config(text=output)
-            text_to_speech(output)
+            tts_queue.put(output)
             return user_obj
     except Exception as ex:
         # Create User
@@ -458,6 +483,16 @@ stt_button.pack(side="right", padx=5, pady=10)
 # Sun Valley TTK Theme by rdbende
 sv_ttk.set_theme("dark")
 
+# -----------------------------------------------------------------------
+# Create Queue to Send TTS Commands
+print("TTS Queue Created.")
+tts_queue = queue.Queue()
+
+# Instantiate TTSThread CLass
+tts_thread = TTSThread(tts_queue)  # Auto-starting thread
+print("TTS Thread Started.")
+
+# -----------------------------------------------------------------------
 # Load user, create new one if needed
 global user_obj
 user_obj = load_user("user.pickle")
@@ -465,14 +500,4 @@ user_obj = load_user("user.pickle")
 # Keeps window visible on the screen until program is closed
 root.mainloop()
 
-
 # -----------------------------------------------------------------------
-
-
-def main():
-    print("MAIN METHOD")
-
-
-# Call the main function
-if __name__ == "__main__":
-    main()
