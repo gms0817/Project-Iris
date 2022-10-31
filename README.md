@@ -6,8 +6,9 @@ Personal AI Companion
 - STT
 - Telling Time
 - Searching Google
-- Expressing Thanks based on user inpuit
-- Expressiing status to the user
+- Expressing Thanks based on user input
+- Expressing status to the user
 - Saying Hello and Goodbye
 - Describing the user (name, age, dob, zipcode, etc)
 - Telling the user how to spell words based on STT input
+- Fixed Iris speaking before printing text. Now, Iris speaks AFTER output_text is updated.
