@@ -1,10 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="2ac673d0-b9a2-4462-9dc3-7f0ff459e080" name="Changes" comment="-added exit handler to close tts process on program close">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+    <list default="true" id="2ac673d0-b9a2-4462-9dc3-7f0ff459e080" name="Changes" comment="-added empty input string query&#10;-added get_date() function and corresponding query">
       <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -86,7 +84,14 @@
       <option name="project" value="LOCAL" />
       <updated>1667232656243</updated>
     </task>
-    <option name="localTasksCounter" value="6" />
+    <task id="LOCAL-00006" summary="-added empty input string query&#10;-added get_date() function and corresponding query">
+      <created>1667234331255</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1667234331255</updated>
+    </task>
+    <option name="localTasksCounter" value="7" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -107,6 +112,7 @@
     <MESSAGE value="-Added Sun Valley TTK Theme by rdbende for a more modern feel/appearance&#10;-added a few basic responses based on user input&#10;-began working on checking if a user exists and creating a user if needed.&#10;-Planning to add responses about weather and the user based on information given.&#10;-implemented ability to create user and save their data to an encrypted file" />
     <MESSAGE value="-Fixed bug where Iris would speak before printing text" />
     <MESSAGE value="-added exit handler to close tts process on program close" />
-    <option name="LAST_COMMIT_MESSAGE" value="-added exit handler to close tts process on program close" />
+    <MESSAGE value="-added empty input string query&#10;-added get_date() function and corresponding query" />
+    <option name="LAST_COMMIT_MESSAGE" value="-added empty input string query&#10;-added get_date() function and corresponding query" />
   </component>
 </project>
