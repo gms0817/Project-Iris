@@ -125,11 +125,11 @@ def toggle_stt():
 
 def get_response(input_text):
     input_text = input_text.lower()
-    print("get_response(): " + input_text)
+    print("User -->" + input_text)
     # -----------------------------------------------------------------------
     # Pre-Defined Responses
     if len(input_text) == 0:
-        return np.random.choice(["How may I help you?","Sorry, I didn't get that. How may I help you?"])
+        return np.random.choice(["How may I help you?", "Sorry, I didn't get that. How may I help you?"])
     elif "time" in input_text:
         return get_time()
     elif "day is it" in input_text or "today" in input_text and "date" in input_text:
@@ -199,6 +199,9 @@ def get_response(input_text):
     # What is the user's age
     elif "old am i" in input_text or "my age" in input_text:
         return "You are " + str(user_obj.user_age) + " years old."
+    # Where is the user from
+    elif "am i from" in input_text or "i live" in input_text:
+        return "You live in " + user_obj.user_city + "."
     # What is the users zodiac sign
     elif "my zodiac" in input_text or "my star sign" in input_text:
         return "Your Zodiac sign is '" + get_zodiac() + "'."
@@ -207,6 +210,14 @@ def get_response(input_text):
         start_of_word = input_text.rindex("spell") + 6
         word = input_text[start_of_word:len(input_text)]
         return spell_word(word)
+    # Weather at specific town
+    elif "weather in" in input_text:
+        start_index = input_text.index("in")
+        location = input_text[start_index:]
+        return get_weather(location)
+    # Weather Outside
+    elif "weather outside" in input_text or "weather today" in input_text:
+        return get_weather(user_obj.user_city)
     # Google Search
     elif "look up" in input_text or "lookup" in input_text or "google" in input_text or "search":
         return google_search(input_text)
@@ -341,39 +352,39 @@ def new_user_popup():
     user_dob_field = ttk.Entry(new_user_window, width=25)
     user_dob_field.pack(padx=10, pady=10)
 
-    # User Zipcode
-    zipcode_label = ttk.Label(
+    # User City/Town
+    city_label = ttk.Label(
         new_user_window,
-        text="Enter your zip-code:\n(Required for location services.)")
-    zipcode_label.pack(padx=10, pady=10)
+        text="Enter your City/Town:\n(Required for location services.)")
+    city_label.pack(padx=10, pady=10)
 
-    zipcode_field = ttk.Entry(new_user_window, width=25)
-    zipcode_field.pack(padx=10, pady=10)
+    city_field = ttk.Entry(new_user_window, width=25)
+    city_field.pack(padx=10, pady=10)
 
     # Add submit button to create new user with data provided
     new_user_submit_button = ttk.Button(
         new_user_window, text="Create User",
         command=lambda: create_user_obj(user_name_field.get(),
-                                        user_dob_field.get(), zipcode_field.get()))
+                                        user_dob_field.get(), city_field.get()))
     new_user_submit_button.pack(padx=10, pady=10, side="bottom")
 
-    def create_user_obj(user_name, user_dob, user_zipcode):
+    def create_user_obj(user_name, user_dob, user_city):
         # Check for properly formatted input
         # Name is not checked in case people want to use usernames instead
         # Conditionals
         dob_pass = False
-        zipcode_pass = False
+        city_pass = False
 
         # Check DOB Format
         if datetime.strptime(user_dob, '%Y-%m-%d'):
             dob_pass = True
 
-        # Check Zipcode Format
-        if len(user_zipcode) == 5 and user_zipcode.isnumeric():
-            zipcode_pass = True
+        # Check City/Town Format
+        if user_city.isalpha():
+            city_pass = True
 
         # Final Check on All Conditions
-        if dob_pass and zipcode_pass:
+        if dob_pass and city_pass:
             # Calculate Age from DOB
             dob_components = user_dob.split('-')
             year, month, day = [int(item) for item in dob_components]
@@ -381,7 +392,7 @@ def new_user_popup():
 
             # Create user_obj
             global user_obj
-            user_obj = user.User(user_name, user_dob, user_age, user_zipcode)
+            user_obj = user.User(user_name, user_dob, user_age, user_city)
             save_user(user_obj)  # Save user as an object to a pickle file
             output = "It is nice to meet you, " + user_obj.user_name + ". How may I help you?"
             output_label.config(text=output)
@@ -392,7 +403,7 @@ def new_user_popup():
             print("User created: "
                   + user_obj.user_name + " "
                   + str(user_obj.user_dob) + " "
-                  + str(user_obj.user_zipcode) + " ")
+                  + str(user_obj.user_city) + " ")
             close_new_user_popup() """
         else:
             print("Error: Incorrect Formatting")
@@ -406,7 +417,6 @@ def new_user_popup():
 def load_user(filename):
     global user_obj
     try:
-        print(filename)
         with open(filename, "rb") as f:
             user_obj = pickle.load(f)
             output = "Welcome back, " + user_obj.user_name + "."
@@ -435,6 +445,7 @@ def create_user():
 # -----------------------------------------------------------------------
 # Build the user interface
 # Create instance of tk.Tk class to create application window and style
+print("Launching Iris...")
 root = tk.Tk()  # Main window
 root.title('Iris: Your Personal Assistant')
 
@@ -492,7 +503,8 @@ submit_button.pack(side="right", padx=5, pady=10)
 
 # Add toggle to turn on voice recognition
 stt_is_on = True
-stt_button = ttk.Button(input_frame, text="STT", width=4, command=toggle_stt)
+microphone_icon = tk.PhotoImage(file="res/microphone_icon.png")
+stt_button = ttk.Button(input_frame, image=microphone_icon, width=4, command=toggle_stt)
 stt_button.pack(side="right", padx=5, pady=10)
 
 # Set Sun Valley TTK Theme
@@ -513,6 +525,7 @@ print("TTS Thread Started.")
 global user_obj
 user_obj = load_user("user.pickle")
 
+print("Iris has successfully launched.")
 # Keeps window visible on the screen until program is closed
 root.mainloop()
 
