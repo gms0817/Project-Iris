@@ -11,20 +11,18 @@ import pyttsx3
 import numpy as np
 import user
 import queue
+import atexit
 from tkinter import ttk
 from datetime import datetime
 from datetime import date
-# from requests_html import HTML
-# from requests_html import HTMLSession
+from requests_html import HTML
+from requests_html import HTMLSession
 from multiprocessing import Process
 from threading import Thread
 
+
 # -----------------------------------------------------------------------
 # Setup / Customize TTS Engine Class
-global voice_option
-voice_option = 1
-
-
 class TTSThread(threading.Thread):
 
     def __init__(self, queue):
@@ -34,12 +32,12 @@ class TTSThread(threading.Thread):
         self.start()
 
     def run(self):
-        global voice_option
+        global engine
         engine = pyttsx3.init()
         engine.setProperty("rate", 185)
         engine.startLoop(False)
         voices = engine.getProperty('voices')
-        engine.setProperty('voice', voices[voice_option].id)  # voices[0] == male, voices[1] == female
+        engine.setProperty('voice', voices[1].id)  # voices[0] == male, voices[1] == female
         thread_running = True
         while thread_running:
             if self.queue.empty():
@@ -51,6 +49,15 @@ class TTSThread(threading.Thread):
                 else:
                     engine.say(data)
         engine.endLoop()
+
+
+# -----------------------------------------------------------------------
+# Setup On-Exit Handling
+def on_exit_app():
+    tts_queue.put("exit")
+
+
+atexit.register(on_exit_app)
 
 
 # -----------------------------------------------------------------------
@@ -268,10 +275,10 @@ def speech_to_text():
 
 
 def switch_tts_voice(option):
-    global voice_option
-    voice_option = option
-    print(voice_option)
-    engine.setProperty('voice', voices[voice_option].id)  # voices[0] == male, voices[1] == female
+    global engine
+    voices = engine.getProperty('voices')
+    print(option)
+    engine.setProperty('voice', voices[option].id)  # voices[0] == male, voices[1] == female
 
 
 # -----------------------------------------------------------------------
@@ -460,7 +467,8 @@ voice_menu_button["menu"] = menu
 voice_menu_button.pack(side="left", padx=10, pady=10)
 
 # Add label to display output
-output_label = ttk.Label(body_frame, text="Hi, my name is Iris. How may I help you?", font=("Arial", 20))
+output_label = ttk.Label(body_frame, text="Hi, my name is Iris. How may I help you?", wraplength=500, justify="center",
+                         font=("Arial", 20))
 output_label.pack()
 
 # Add text box to collect user input

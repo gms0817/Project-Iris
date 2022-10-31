@@ -12,3 +12,4 @@ Personal AI Companion
 - Describing the user (name, age, dob, zipcode, etc)
 - Telling the user how to spell words based on STT input
 - Fixed Iris speaking before printing text. Now, Iris speaks AFTER output_text is updated.
+- Added exit handler to stop TTS process on program exit
