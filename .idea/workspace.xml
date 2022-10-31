@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="2ac673d0-b9a2-4462-9dc3-7f0ff459e080" name="Changes" comment="-Fixed bug where Iris would speak before printing text">
+    <list default="true" id="2ac673d0-b9a2-4462-9dc3-7f0ff459e080" name="Changes" comment="-added exit handler to close tts process on program close">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
@@ -79,7 +79,14 @@
       <option name="project" value="LOCAL" />
       <updated>1667229096344</updated>
     </task>
-    <option name="localTasksCounter" value="5" />
+    <task id="LOCAL-00005" summary="-added exit handler to close tts process on program close">
+      <created>1667232656243</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1667232656243</updated>
+    </task>
+    <option name="localTasksCounter" value="6" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -99,6 +106,7 @@
     </ignored-roots>
     <MESSAGE value="-Added Sun Valley TTK Theme by rdbende for a more modern feel/appearance&#10;-added a few basic responses based on user input&#10;-began working on checking if a user exists and creating a user if needed.&#10;-Planning to add responses about weather and the user based on information given.&#10;-implemented ability to create user and save their data to an encrypted file" />
     <MESSAGE value="-Fixed bug where Iris would speak before printing text" />
-    <option name="LAST_COMMIT_MESSAGE" value="-Fixed bug where Iris would speak before printing text" />
+    <MESSAGE value="-added exit handler to close tts process on program close" />
+    <option name="LAST_COMMIT_MESSAGE" value="-added exit handler to close tts process on program close" />
   </component>
 </project>

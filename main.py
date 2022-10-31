@@ -108,6 +108,10 @@ def get_time():
     return "The current time is " + current_time
 
 
+def get_date():
+    return "Today is " + datetime.today().strftime("%A") + "."
+
+
 def calculate_age(dob):
     today = date.today()
     age = today.year - dob.year - ((today.month, today.day) < (dob.month, dob.day))
@@ -124,8 +128,12 @@ def get_response(input_text):
     print("get_response(): " + input_text)
     # -----------------------------------------------------------------------
     # Pre-Defined Responses
-    if "time" in input_text:
+    if len(input_text) == 0:
+        return np.random.choice(["How may I help you?","Sorry, I didn't get that. How may I help you?"])
+    elif "time" in input_text:
         return get_time()
+    elif "day is it" in input_text or "today" in input_text and "date" in input_text:
+        return get_date()
     # Use to Debug/Test TTS Pronounciation
     elif "@say " in input_text:
         return input_text[4:]
