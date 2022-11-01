@@ -12,6 +12,8 @@ import numpy as np
 import user
 import queue
 import atexit
+import praw
+import pandas as pd
 from tkinter import ttk
 from datetime import datetime
 from datetime import date
@@ -214,10 +216,9 @@ def get_response(input_text):
     elif "weather in" in input_text:
         start_index = input_text.index("in")
         location = input_text[start_index:]
-        return get_weather(location)
     # Weather Outside
-    elif "weather outside" in input_text or "weather today" in input_text:
-        return get_weather(user_obj.user_city)
+    # elif "weather outside" in input_text or "weather today" in input_text:
+    # return get_weather(user_obj.user_city)
     # Google Search
     elif "look up" in input_text or "lookup" in input_text or "google" in input_text or "search":
         return google_search(input_text)
@@ -225,6 +226,90 @@ def get_response(input_text):
     else:
         return "I'm sorry. I do not understand."
     # AI Generated Responses - WIP
+
+
+# -----------------------------------------------------------------------
+# Reddit Scraping
+def reddit_scraper_popup():
+    # Scrape Reddit Based on User Input
+    def scrape_reddit(subreddit_input, num_of_posts):
+        status_label.config(text="Scraping...")
+        # Remove r/ if user puts it in
+        if "/r" in subreddit_input:
+            subreddit_input = subreddit_input[2:]
+        print("Subreddit: " + subreddit_input)  # For debugging
+
+        # Collect integer from num_of_posts input
+        num_of_posts = int(num_of_posts)
+        print("Number of Posts: " + str(num_of_posts))  # For debugging
+
+        # Read-only instance of scraper
+        reddit_read_only = praw.Reddit(client_id="RVwOTqiFJbXKWzeHRztGHQ",
+                                       client_secret="cg70MVjFpakehf6k-zwCXXim0KymfA",
+                                       user_agent="GmS_11702")
+
+        # Create subreddit object
+        subreddit = reddit_read_only.subreddit(subreddit_input)
+        print("Display Name: ", subreddit.display_name)
+        print("Description: ", subreddit.description)
+
+        # Print 5 'Hot' Posts from subreddit (content inside post only)
+        for post in subreddit.hot(limit=5):
+            print(post.selftext)
+            print()
+
+        # Create posts dictionary to store text from posts
+        posts_dict = {"Title": [], "Post Text": []}
+
+        # Scrape top num_of_posts posts based on flair
+        for post in subreddit.hot(limit=num_of_posts):
+            # Text from the post
+            posts_dict["Title"].append(post.title)
+            posts_dict["Post Text"].append(post.selftext)
+        status_label.config(text="Scraping Complete.")
+        # save data into a pandas dataframe
+        random_posts = pd.DataFrame(posts_dict)
+
+        # Export dataframe to .csv
+        file_name = "r-" + subreddit.display_name + " - " + str(num_of_posts) + ".csv"
+        random_posts.to_csv(file_name, index=False)
+
+    # -----------------------------------------------------------------------
+    # Create popup window
+    reddit_scraper = tk.Toplevel(root)
+    reddit_scraper.geometry(f'{400}x{400}+{center_x + 160}+{center_y}')
+    reddit_scraper.focus()
+
+    # Tool Title
+    title_label = ttk.Label(reddit_scraper, text="Reddit Scraper")
+    title_label.pack(padx=10, pady=15)
+
+    # Subreddit to Scrape
+    subreddit_label = ttk.Label(reddit_scraper, text="What subreddit do you want to scrape?")
+    subreddit_label.pack(padx=10, pady=10)
+
+    subreddit_field = ttk.Entry(reddit_scraper, width=25)
+    subreddit_field.pack(padx=10, pady=10)
+
+    # Number of Posts to Scrape
+    num_of_posts_label = ttk.Label(reddit_scraper, text="How many posts would you like to scrape?")
+    num_of_posts_label.pack(padx=10, pady=10)
+
+    num_of_posts_field = ttk.Entry(reddit_scraper, width=25)
+    num_of_posts_field.pack(padx=10, pady=10)
+
+    # Choose a file path to save the .csv
+
+    # Status Label
+    status_label = ttk.Label(reddit_scraper, text="Waiting...")
+    status_label.pack(padx=10, pady=10)
+
+    # Submit Button
+    reddit_submit_button = ttk.Button(reddit_scraper,
+                                      text="Scrape",
+                                      command=lambda: [status_label.config(text="Scraping..."),
+                                                       scrape_reddit(subreddit_field.get(), num_of_posts_field.get())])
+    reddit_submit_button.pack(padx=10, pady=10)
 
 
 # -----------------------------------------------------------------------
@@ -279,6 +364,7 @@ def google_search(query):
 
 
 # -----------------------------------------------------------------------
+# Stt/TTS Functions
 def speech_to_text():
     recognizer = sr.Recognizer()
     with sr.Microphone() as mic:
@@ -288,7 +374,6 @@ def speech_to_text():
         text = recognizer.recognize_google(audio)
         print("me --> ", text)
         set_output_text_voice(text)
-        tts_queue.put(output)
     except Exception as e:
         print(e)
 
@@ -324,6 +409,8 @@ def set_output_text_key(self):
     tts_queue.put(output)
 
 
+# -----------------------------------------------------------------------
+# User Handling Functions
 def new_user_popup():
     # Create popup window
     new_user_window = tk.Toplevel(root)
@@ -478,12 +565,20 @@ input_frame = ttk.Frame(footer_frame)
 input_frame.pack()
 
 # Add menu bar to header
+# Add voices menu to header
 voice_menu_button = ttk.Menubutton(header_frame, text="Voices ")
 menu = tk.Menu(voice_menu_button, tearoff=0)
 menu.add_radiobutton(label="David", value="David", command=lambda: switch_tts_voice(0))
 menu.add_radiobutton(label="Zika", value="Zika", command=lambda: switch_tts_voice(1))
 voice_menu_button["menu"] = menu
 voice_menu_button.pack(side="left", padx=10, pady=10)
+
+# Add Tools menu to header
+tools_menu_button = ttk.Menubutton(header_frame, text="Tools ")
+tools_menu = tk.Menu(tools_menu_button, tearoff=0)
+tools_menu.add_command(label="Reddit Scraper", command=reddit_scraper_popup)
+tools_menu_button["menu"] = tools_menu
+tools_menu_button.pack(side="left", padx=10, pady=10)
 
 # Add label to display output
 output_label = ttk.Label(body_frame, text="Hi, my name is Iris. How may I help you?", wraplength=500, justify="center",
