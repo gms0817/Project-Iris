@@ -7,6 +7,7 @@ import time
 import tkinter as tk
 import urllib
 import requests.exceptions
+import requests
 import sv_ttk
 import speech_recognition as sr
 import pyttsx3
@@ -24,6 +25,7 @@ from requests_html import HTML
 from requests_html import HTMLSession
 from multiprocessing import Process
 from threading import Thread
+from bs4 import BeautifulSoup
 
 
 # -----------------------------------------------------------------------
@@ -57,16 +59,41 @@ class TTSThread(threading.Thread):
 
 
 # -----------------------------------------------------------------------
-# Setup On-Exit Handling
-def on_exit_app():
-    tts_queue.put("exit")
-
-
-atexit.register(on_exit_app)
-
-
-# -----------------------------------------------------------------------
 # Helper Functions
+def get_weather(city_name):
+    separator = city_name.rindex(' ')
+    state_name = city_name[separator:]
+    state_name.capitalize()
+    city_name = city_name[0:separator]
+    city_name.capitalize()
+    location = city_name + state_name
+    location = location.capitalize()
+    print(location)
+
+    # Create URL
+    url = "https://www.google.com/search?q=" + "weather" + location
+
+    # Request Instance
+    html = requests.get(url).content
+
+    # Get the raw data
+    soup = BeautifulSoup(html, 'html.parser')
+
+    # Get the temperature
+    temp = soup.find('div', attrs={'class': 'BNeawe iBp4i AP7Wnd'}).text
+
+    # Get the time and sky description
+    str = soup.find('div', attrs={'class': 'BNeawe tAd8D AP7Wnd'}).text
+
+    # Format the data
+    data = str.split('\n')
+    time = data[0]
+    sky = data[1]
+    output = f'It is currently {temp} degrees in {location}.'
+
+    return output
+
+
 def spell_word(input_text):
     output = (input_text + " is spelled ")
 
@@ -216,12 +243,14 @@ def get_response(input_text):
         word = input_text[start_of_word:len(input_text)]
         return spell_word(word)
     # Weather at specific town
-    elif "weather in" in input_text:
-        start_index = input_text.index("in")
+    elif "weather in" in input_text or "weather at" in input_text:
+        start_index = input_text.index("in") + 2
         location = input_text[start_index:]
+        return get_weather(location)
     # Weather Outside
-    # elif "weather outside" in input_text or "weather today" in input_text:
-    # return get_weather(user_obj.user_city)
+    elif "weather outside" in input_text or "weather today" in input_text or "the weather" in input_text:
+        location = user_obj.user_city
+        return get_weather(location)
     # Google Search
     elif "look up" in input_text or "lookup" in input_text or "google" in input_text or "search":
         return google_search(input_text)
@@ -397,7 +426,7 @@ def google_search(query):
 
 
 # -----------------------------------------------------------------------
-# Stt/TTS Functions
+# STT/TTS Functions
 def speech_to_text():
     recognizer = sr.Recognizer()
     with sr.Microphone() as mic:
@@ -475,7 +504,7 @@ def new_user_popup():
     # User City/Town
     city_label = ttk.Label(
         new_user_window,
-        text="Enter your City/Town:\n(Required for location services.)")
+        text="Enter your City and State Abbreviation:\n(Required for location services.)\n")
     city_label.pack(padx=10, pady=10)
 
     city_field = ttk.Entry(new_user_window, width=25)
@@ -500,7 +529,7 @@ def new_user_popup():
             dob_pass = True
 
         # Check City/Town Format
-        if user_city.isalpha():
+        if not user_city.isnumeric():
             city_pass = True
 
         # Final Check on All Conditions
@@ -657,4 +686,18 @@ print("Iris has successfully launched.")
 # Keeps window visible on the screen until program is closed
 root.mainloop()
 
+
 # -----------------------------------------------------------------------
+# Setup On-Exit Handling
+def on_exit_app():
+    tts_queue.put("exit")
+atexit.register(on_exit_app)
+
+
+# -----------------------------------------------------------------------
+def main():
+    print("main() Reached.")
+
+
+if __name__ == "__main__":
+    main()

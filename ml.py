@@ -69,27 +69,9 @@ model.summary()
 # Reset training
 clear_session()
 
-# Gets the computed weights from the previous training
-history = model.fit(X_train, y_train,
-                    epochs=100,
-                    verbose=False,
-                    validation_data=(X_test, y_test),
-                    batch_size=10)
 
-
-# Evaluate accuracy of keras sequential model
-loss, accuracy = model.evaluate(X_train, y_train, verbose=False)
-print("Training Accuracy: {:.4f}".format(accuracy))
-loss, accuracy = model.evaluate(X_test, y_test, verbose=False)
-print("Testing Accuracy:  {:.4f}".format(accuracy))
-
-# Visualize the loss and accuracy for training and testing data
-plt.style.use('ggplot')
-
-
-def plot_history(history):
+def plot_history(hist):
     print(history.history)
-
 
     acc = history.history['accuracy']
     val_acc = history.history['val_accuracy']
@@ -97,6 +79,8 @@ def plot_history(history):
     val_loss = history.history['val_loss']
     x = range(1, len(acc) + 1)
 
+
+    # Setup Plot
     plt.figure(figsize=(12, 5))
     plt.subplot(1, 2, 1)
     plt.plot(x, acc, 'b', label='Training acc')
@@ -110,5 +94,21 @@ def plot_history(history):
     plt.legend()
     plt.show()
 
+
+# Gets the computed weights from the previous training
+history = model.fit(X_train, y_train,
+                    epochs=100,
+                    verbose=False,
+                    validation_data=(X_test, y_test),
+                    batch_size=10)
+
+# Evaluate accuracy of keras sequential model
+loss, accuracy = model.evaluate(X_train, y_train, verbose=False)
+print("Training Accuracy: {:.4f}".format(accuracy))
+loss, accuracy = model.evaluate(X_test, y_test, verbose=False)
+print("Testing Accuracy:  {:.4f}".format(accuracy))
+
+# Visualize the loss and accuracy for training and testing data
+plt.style.use('ggplot')
 
 plot_history(history)
