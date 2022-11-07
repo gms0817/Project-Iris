@@ -2,6 +2,7 @@
 # Imports
 import os
 import pickle
+import string
 import threading
 import time
 import tkinter as tk
@@ -94,6 +95,38 @@ def get_weather(city_name):
     return output
 
 
+def get_user_weather():
+    location = user_obj.user_city
+    # Create URL
+    url = "https://www.google.com/search?q=" + "weather" + location
+
+    # Request Instance
+    html = requests.get(url).content
+
+    # Get the raw data
+    soup = BeautifulSoup(html, 'html.parser')
+
+    # Get the temperature
+    temp = soup.find('div', attrs={'class': 'BNeawe iBp4i AP7Wnd'}).text
+
+    # Format the data
+    output = f'{temp} in {location}'
+
+    return output
+
+
+def update_weather_label():
+    i = 0
+    while True:
+        print("Temperature Updated.\n")
+        i = i + 1
+
+        temp = get_user_weather()
+        # temp = f"TEST-{i}"
+        weather_label.config(text=str(temp))
+        time.sleep(1800)  # Update Weather Label Every 1/2 Hour -> 60 * 60 = 3600 / 2 = 1800 seconds
+
+
 def spell_word(input_text):
     output = (input_text + " is spelled ")
 
@@ -166,7 +199,7 @@ def get_response(input_text):
         return get_time()
     elif "day is it" in input_text or "today" in input_text and "date" in input_text:
         return get_date()
-    # Use to Debug/Test TTS Pronounciation
+    # Use to Debug/Test TTS Pronunciation
     elif "@say " in input_text:
         return input_text[4:]
     # Thanks / Appreciation to Iris
@@ -592,6 +625,28 @@ def create_user():
 
 
 # -----------------------------------------------------------------------
+# Setup On-Exit Handling
+def on_exit_app():
+    tts_queue.put("exit")
+
+
+# -----------------------------------------------------------------------
+# main Functions
+def main():
+    print("Reached main().")
+
+    # Load user, create new one if needed
+    user_obj = load_user("user.pickle")
+
+    # Start weather update thread
+    weather_thread = threading.Thread(target=update_weather_label)
+    weather_thread.start()
+
+    # Initialize Exit Handling
+    atexit.register(on_exit_app)
+
+
+# -----------------------------------------------------------------------
 # Build the user interface
 # Create instance of tk.Tk class to create application window and style
 print("Launching Iris...")
@@ -642,6 +697,9 @@ tools_menu.add_command(label="Reddit Scraper", command=reddit_scraper_popup)
 tools_menu_button["menu"] = tools_menu
 tools_menu_button.pack(side="left", padx=10, pady=10)
 
+# Add weather to header
+weather_label = ttk.Label(header_frame)
+weather_label.pack(side='right', padx=10, pady=10)
 # Add label to display output
 output_label = ttk.Label(body_frame, text="Hi, my name is Iris. How may I help you?", wraplength=500, justify="center",
                          font=("Arial", 20))
@@ -677,27 +735,12 @@ tts_queue = queue.Queue()
 tts_thread = TTSThread(tts_queue)  # Auto-starting thread
 print("TTS Thread Started.")
 
-# -----------------------------------------------------------------------
-# Load user, create new one if needed
-global user_obj
-user_obj = load_user("user.pickle")
-
 print("Iris has successfully launched.")
-# Keeps window visible on the screen until program is closed
-root.mainloop()
-
-
-# -----------------------------------------------------------------------
-# Setup On-Exit Handling
-def on_exit_app():
-    tts_queue.put("exit")
-atexit.register(on_exit_app)
-
-
-# -----------------------------------------------------------------------
-def main():
-    print("main() Reached.")
-
 
 if __name__ == "__main__":
     main()
+
+    # Keeps window visible on the screen until program is closed
+    root.mainloop()
+
+# -----------------------------------------------------------------------
