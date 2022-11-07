@@ -1,7 +1,9 @@
 # -----------------------------------------------------------------------
 # Imports
+import os
 import pickle
 import threading
+import time
 import tkinter as tk
 import urllib
 import requests.exceptions
@@ -17,6 +19,7 @@ import pandas as pd
 from tkinter import ttk
 from datetime import datetime
 from datetime import date
+from psaw import PushshiftAPI
 from requests_html import HTML
 from requests_html import HTMLSession
 from multiprocessing import Process
@@ -233,46 +236,76 @@ def get_response(input_text):
 def reddit_scraper_popup():
     # Scrape Reddit Based on User Input
     def scrape_reddit(subreddit_input, num_of_posts):
+        # Initialize PushshiftAPI
+        api = PushshiftAPI()
+
+        # Update Status Label
         status_label.config(text="Scraping...")
+
         # Remove r/ if user puts it in
         if "/r" in subreddit_input:
             subreddit_input = subreddit_input[2:]
         print("Subreddit: " + subreddit_input)  # For debugging
 
         # Collect integer from num_of_posts input
-        num_of_posts = int(num_of_posts)
+        if "all" in num_of_posts:
+            num_of_posts = None
+        else:
+            num_of_posts = int(num_of_posts)
         print("Number of Posts: " + str(num_of_posts))  # For debugging
 
         # Read-only instance of scraper
-        reddit_read_only = praw.Reddit(client_id="RVwOTqiFJbXKWzeHRztGHQ",
-                                       client_secret="cg70MVjFpakehf6k-zwCXXim0KymfA",
-                                       user_agent="GmS_11702")
+        reddit = praw.Reddit(client_id="RVwOTqiFJbXKWzeHRztGHQ",
+                             client_secret="cg70MVjFpakehf6k-zwCXXim0KymfA",
+                             user_agent="GmS_11702")
 
-        # Create subreddit object
-        subreddit = reddit_read_only.subreddit(subreddit_input)
-        print("Display Name: ", subreddit.display_name)
-        print("Description: ", subreddit.description)
+        subreddit = subreddit_input
+        start_year = 2021
+        end_year = 2022
 
-        # Print 5 'Hot' Posts from subreddit (content inside post only)
-        for post in subreddit.hot(limit=5):
-            print(post.selftext)
-            print()
+        # Directory to store data
+        directory = './reddit-data/'
+        if not os.path.exists(directory):
+            os.makedirs(directory)
 
-        # Create posts dictionary to store text from posts
-        posts_dict = {"Title": [], "Post Text": []}
+        # Initialize time-stamps to define timeframe of posts
+        ts_after = int(datetime(start_year, 1, 1).timestamp())
+        ts_before = int(datetime(end_year + 1, 1, 1).timestamp())
 
-        # Scrape top num_of_posts posts based on flair
-        for post in subreddit.hot(limit=num_of_posts):
-            # Text from the post
-            posts_dict["Title"].append(post.title)
-            posts_dict["Post Text"].append(post.selftext)
-        status_label.config(text="Scraping Complete.")
-        # save data into a pandas dataframe
-        random_posts = pd.DataFrame(posts_dict)
+        submissions_dict = {
+            "title": [],
+            "selftext": []
+        }
 
-        # Export dataframe to .csv
-        file_name = "r-" + subreddit.display_name + " - " + str(num_of_posts) + ".csv"
-        random_posts.to_csv(file_name, index=False)
+        # Use PSAW to get ID of submissions based on time interval
+        gen = api.search_submissions(
+            after=ts_after,
+            before=ts_before,
+            filter=['id'],
+            subreddit=subreddit,
+            limit=num_of_posts
+        )
+
+        # Use PRAW to get submission information
+        submission_count = 0
+        start_time = time.time()
+        for submission_psaw in gen:
+            time_elapsed = str(time.time() - start_time)
+            submission_count = submission_count + 1
+            # Use psaw
+            submission_id = submission_psaw.d_['id']
+
+            # Use praw
+            submission_praw = reddit.submission(id=submission_id)
+
+            # Add submission data to submissions dictionary
+            submissions_dict["title"].append(submission_praw.title)
+            submissions_dict["selftext"].append(submission_praw.selftext)
+            print(
+                f"Elapsed Time: {(time.time() - start_time) / 60: .2f}m | Submission Number: " + str(submission_count))
+        print(submissions_dict)
+        # Save scraped data to csv
+        pd.DataFrame(submissions_dict).to_csv(directory + subreddit + '.csv', index=False)
 
     # -----------------------------------------------------------------------
     # Create popup window
