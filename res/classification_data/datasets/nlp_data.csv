@@ -1,0 +1,116 @@
+﻿data,category
+hello,greeting
+hi,greeting
+"hey, how are you",greeting
+whats up,greeting
+long time no see,greeting
+see you,goodbye
+goodbye,goodbye
+bye,goodbye
+farewell,goodbye
+talk to you later,goodbye
+what time is it,time
+tell me the time,time
+the time,time
+give me the time,time
+what is the current time,time
+what is todays date,date
+what day is it,date
+tell me the date,date
+what is today,date
+what day of the week is it,date
+thanks so much,appreciation
+thank you,appreciation
+I really appreciate it,appreciation
+im very grateful for this,appreciation
+thanks again,appreciation
+how are you,iris_mood
+how are you feeling today,iris_mood
+whats your mood,iris_mood
+what are you feeling,iris_mood
+are you okay,iris_mood
+what is your name,iris_name
+tell me your name,iris_name
+who are you,iris_name
+what are you,iris_name
+what should I call you,iris_name
+when were you born,iris_birthday
+what is your birthday,iris_birthday
+what day were you born,iris_birthday
+what year were you born,iris_birthday
+when is your birth,iris_birthday
+how old are you,iris_age
+tell me your age,iris_age
+are you old,iris_age
+how many years old are you,iris_age
+are you young,iris_age
+what is your star sign,iris_zodiac
+what is your zodiac,iris_zodiac
+tell me your star sign,iris_zodiac
+tell me your zodiac,iris_zodiac
+what is your sign,iris_zodiac
+who made you,iris_creator
+who is your created,iris_creator
+do you have parents,iris_creator
+who is your dad,iris_creator
+what is your mom,iris_creator
+im feeling great today,user_happy
+I am really happy,user_happy
+I am feeling good,user_happy
+so happy today,user_happy
+feeling great,user_happy
+I feel bad,user_sad
+I don’t feel that good ,user_sad
+today isnt going the best,user_sad
+I just want to go home,user_sad
+im so sad,user_sad
+im livid,user_angry
+im so mad,user_angry
+I cant believe this!!,user_angry
+im so mad today,user_angry
+so angry,user_angry
+what is my name,user_name
+tell me my name,user_name
+who am i,user_name
+who do you think I am,user_name
+do you know my name,user_name
+what is my birthday,user_birthday
+tell me my birthday,user_birthday
+when is my birthday,user_birthday
+do you know when my birthday is,user_birthday
+when is my birthday iris,user_birthday
+how old am i,user_age
+whats my age,user_age
+tell me my age,user_age
+tell me how old I am,user_age
+am I old,user_age
+where do I live,user_location
+what town am I from,user_location
+what city do I live in,user_location
+what town do I live in,user_location
+what city am I from,user_location
+what is my zodiac sign,user_zodiac
+what is my star sign,user_zodiac
+tell me my star sign,user_zodiac
+do you know my sign,user_zodiac
+do you know my zodiac sign,user_zodiac
+what is the weather today,user_weather
+is it hot outside,user_weather
+is it cold outside,user_weather
+what is the temperate outside,user_weather
+how cold is it today,user_weather
+what is the weather in ,weather_at_location
+how cold is it in ,weather_at_location
+what is the temperate at,weather_at_location
+how has is it in ,weather_at_location
+do I need a jacket to go to,weather_at_location
+can you spell,spelling_request
+how do you spell ,spelling_request
+tell me how to spell,spelling_request
+what is the spelling for,spelling_request
+what is the spelling of,spelling_request
+look up how to,google_request
+search how to ,google_request
+google what is,google_request
+lookup when is,google_request
+look up what the,google_request

@@ -11,9 +11,9 @@ from sklearn.linear_model import SGDClassifier
 
 def load_data():
     # Configure Filepaths
-    filepath_dict = {'anxiety': 'data/anxiety.csv',
-                     'depression': 'data/depression.csv',
-                     'tourettes': 'data/tourettes.csv'}
+    filepath_dict = {'anxiety': 'res/classification_data/datasets/anxiety.csv',
+                     'depression': 'res/classification_data/datasets/depression.csv',
+                     'tourettes': 'res/classification_data/datasets/tourettes.csv'}
 
     df_list = []
 
@@ -50,7 +50,7 @@ def naive_bayes_classifier(df):
     # Test Performance of NB Classifier (Detailed)
     i = 0
     test_list = []
-    shuffled_df = df.sample(n=10)  # Get a random sample to use so that each illness/disorder is tested
+    shuffled_df = df.sample(frac=1)  # Get a random sample to use so that each illness/disorder is tested
     start_time = time.time()
     for selftext in shuffled_df.selftext:
         pred = text_clf.predict(shuffled_df.selftext)
@@ -60,7 +60,7 @@ def naive_bayes_classifier(df):
             result = 'PASS'
         else:
             result = 'FAIL'
-        test = f'ID: {i+1}/{len(shuffled_df)} | Prediction: {pred[i]} | Actual: {actual} ' \
+        test = f'ID: {i + 1}/{len(shuffled_df)} | Prediction: {pred[i]} | Actual: {actual} ' \
                f'| Result: {result} | Selftext: {selftext}'
         print(f'Time Elapsed: {time_elapsed:.2f}m | {test}')
         i = i + 1
@@ -73,7 +73,7 @@ def naive_bayes_classifier(df):
     test_df = pd.DataFrame(test_list, columns=['Results'])
     test_df.to_csv('data/test_results.csv', index=0)
     print("Detailed Testing Complete - test_results.csv created.")
-    print(f"Total Time Elaped: {total_time:.2f}m")
+    print(f"Total Time Elapsed: {total_time:.2f}m")
 
     # Test Performance of NB Classifier (General)
     predicted = text_clf.predict(df.selftext)
@@ -81,7 +81,6 @@ def naive_bayes_classifier(df):
     score = np.mean(predicted == df.category)
     print(f'Average Performance (Naive Bayes): {score}.')
     print("General Testing Complete.")
-
 
 
 def main():
@@ -92,7 +91,6 @@ def main():
 
     # Run Naive Bayes(NB) Machine-learning Algorithm
     naive_bayes_classifier(df)
-
 
 
 if __name__ == "__main__":
@@ -113,7 +111,7 @@ vectorizer.fit(sentences_train)
 X_train = vectorizer.transform(sentences_train)
 X_test = vectorizer.transform(sentences_test)
 
-# Setup logistic regression classification model and train
+# Setup logistic regression classification_data model and train
 classifier = LogisticRegression()
 classifier.fit(X_train, y_train)
 

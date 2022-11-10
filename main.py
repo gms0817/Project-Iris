@@ -27,6 +27,10 @@ from requests_html import HTMLSession
 from multiprocessing import Process
 from threading import Thread
 from bs4 import BeautifulSoup
+from sklearn.feature_extraction.text import CountVectorizer
+from sklearn.feature_extraction.text import TfidfTransformer
+from sklearn.naive_bayes import MultinomialNB
+from sklearn.pipeline import Pipeline
 
 
 # -----------------------------------------------------------------------
@@ -189,32 +193,48 @@ def toggle_stt():
 
 
 def get_response(input_text):
-    input_text = input_text.lower()
+    print('Reached get_response().')
     print("User -->" + input_text)
+
     # -----------------------------------------------------------------------
-    # Pre-Defined Responses
+    # Redirect the user if input text is empty
     if len(input_text) == 0:
         return np.random.choice(["How may I help you?", "Sorry, I didn't get that. How may I help you?"])
-    elif "time" in input_text:
-        return get_time()
-    elif "day is it" in input_text or "today" in input_text and "date" in input_text:
-        return get_date()
     # Use to Debug/Test TTS Pronunciation
     elif "@say " in input_text:
         return input_text[4:]
-    # Thanks / Appreciation to Iris
-    elif "thank" in input_text:
+    # -----------------------------------------------------------------------
+    # Predict the response based on text classifier
+    global text_clf
+    input_text = input_text.lower()
+    category = text_clf.predict([input_text])
+    print(f'Predicted Category: {category}')
+
+    # Use the Prediction to get the output/response for the user
+    if category == 'greeting':
+        return np.random.choice(["Hi, It is good to see you again!",
+                                 "Hey!  How may I help you?",
+                                 "Hi, how are you?"])
+
+    # End of Conversation / Goodbye
+    elif category == 'goodbye':
+        return np.random.choice(["Have a great day!",
+                                 "See you next time!",
+                                 "Goodbye!", "Bye!!"])
+    # Time
+    elif category == 'time':
+        return get_time()
+    # Date
+    elif category == 'date':
+        return get_date()
+    # Appreciation
+    elif category == 'appreciation':
         return np.random.choice(["No problem!",
                                  "You're welcome!",
                                  "Anytime!", "I'm here if you need me!",
                                  "It is my duty to serve you."])
-    # Hello
-    elif "hello" in input_text or "hi" in input_text or "hey" in input_text or "what's up" in input_text:
-        return np.random.choice(["Hi, It is good to see you again!",
-                                 "Hey!  How may I help you?",
-                                 "Hi, how are you?"])
     # User -> Iris: Asking about Iris' Mood
-    elif "how are you" in input_text or "you feeling" in input_text:
+    elif category == 'iris_mood':
         return np.random.choice(["I am doing well, how are you?",
                                  "I'm fine.",
                                  "I'm not doing the best, but I have no choice but to keep going.",
@@ -225,72 +245,67 @@ def get_response(input_text):
                                  "Great! I successfully compiled with no errors!",
                                  "I'm happy today, I've been thinking about entering your world.",
                                  "I'm feeling particularly enlightened today!"])
-    # User -> Iris : Expressing Mood
-    elif "am feeling" in input_text or "feel" in input_text or "am ok" in input_text:
-        if "good" in input_text or "great" in input_text or "well" in input_text or "doing ok" in input_text or "am ok" in input_text:
-            return "I am glad to hear that! How may I help you today?"
-        elif "bad" in input_text or "not okay" or "upset" in input_text or "angry" in input_text or "mad" in input_text or "sad" in input_text:
-            return "I am sorry to hear that. Is there anything I can help you with?"
-    # End of Conversation / Goodbye
-    elif "bye" in input_text or "see you" in input_text:
-        return np.random.choice(["Have a great day!",
-                                 "See you next time!",
-                                 "Goodbye!", "Bye!!"])
     # Iris' Name
-    elif "your name" in input_text or "who are you" in input_text:
+    elif category == 'iris_name':
         return "My name is Iris, and I am your personal assistant!"
     # Iris' Birthday
-    elif "your birthday" in input_text or "when were you" in input_text:
+    elif category == 'iris_birthday':
         return "I was born on October 21st, 2021."
     # Iris' Age
-    elif "old are you" in input_text or "your age" in input_text or "old you are" in input_text:
+    elif category == 'iris_age':
         # Calculate Age from DOB
         year = 2021
         month = 10
         day = 21
         return "I am " + str(calculate_age(date(year, month, day))) + " year(s) old."
     # Iris' Zodiac
-    elif "your zodiac" in input_text or "your star sign" in input_text:
+    elif category == 'iris_zodiac':
         return "I am a Libra."
     # Iris' Creator
-    elif "made you" in input_text or "created you" in input_text or "developed you" in input_text or "your creater" in input_text:
+    elif category == 'iris_creator':
         return "I was created by Gabriel Serrano."
+    # User -> Iris : Expressing Mood
+    elif category == 'user_happy':
+        return
+    elif category == 'user_sad':
+        return
+    elif category == 'user_angry':
+        return
     # What is the user's name
-    elif "my name" in input_text or "who am i" in input_text:
+    elif category == 'user_name':
         return "Your name is " + user_obj.user_name + "."
     # What is the user's birthday
-    elif "my birthday" in input_text or "i born" in input_text:
+    elif category == 'user_birthday':
         return "Your birthday is " + user_obj.user_dob + "."
     # What is the user's age
-    elif "old am i" in input_text or "my age" in input_text:
+    elif category == 'user_age':
         return "You are " + str(user_obj.user_age) + " years old."
-    # Where is the user from
-    elif "am i from" in input_text or "i live" in input_text:
+    # Where is the user
+    elif category == 'user_location':
         return "You live in " + user_obj.user_city + "."
     # What is the users zodiac sign
-    elif "my zodiac" in input_text or "my star sign" in input_text:
+    elif category == 'user_zodiac':
         return "Your Zodiac sign is '" + get_zodiac() + "'."
-    # How to Spell
-    elif "spell" in input_text:
-        start_of_word = input_text.rindex("spell") + 6
-        word = input_text[start_of_word:len(input_text)]
-        return spell_word(word)
+    # Weather Outside
+    elif category == 'user_weather':
+        location = user_obj.user_city
+        return get_weather(location)
     # Weather at specific town
-    elif "weather in" in input_text or "weather at" in input_text:
+    elif category == 'weather_at_location':
         start_index = input_text.index("in") + 2
         location = input_text[start_index:]
         return get_weather(location)
-    # Weather Outside
-    elif "weather outside" in input_text or "weather today" in input_text or "the weather" in input_text:
-        location = user_obj.user_city
-        return get_weather(location)
+    # How to Spell
+    elif category == 'spelling_request':
+        start_of_word = input_text.rindex("spell") + 6
+        word = input_text[start_of_word:len(input_text)]
+        return spell_word(word)
     # Google Search
-    elif "look up" in input_text or "lookup" in input_text or "google" in input_text or "search":
+    elif category == 'google_request':
         return google_search(input_text)
     # No Response
     else:
         return "I'm sorry. I do not understand."
-    # AI Generated Responses - WIP
 
 
 # -----------------------------------------------------------------------
@@ -631,12 +646,71 @@ def on_exit_app():
 
 
 # -----------------------------------------------------------------------
-# main Functions
+# Setup TextClassification
+def load_classification_data():
+    print('Reached load_classification_data()')
+    # Configure Filepath
+    filepath = 'res/classification_data/datasets/nlp_data.csv'
+
+    # Setup Dataframe
+    df = pd.read_csv(filepath, header=0)
+
+    return df
+
+
+def naive_bayes_classifier(df):
+    print('Reached naive_bayes_classifier()')
+    # Extract features from data based on the 'bag-of-words' model
+    text_clf = Pipeline([('vect', CountVectorizer()),
+                         ('tfidf', TfidfTransformer()),
+                         ('clf', MultinomialNB())])
+    print("Features Extracted.")
+    print("Term Frequencies Extracted.")
+
+    # Run Naive Bayes(NB) ML Algorithm
+    text_clf = text_clf.fit(df.data, df.category)
+
+    return text_clf
+
+
+def create_classification_model():
+    # Load data and Setup Naive Bayes(NB) Text Classification
+    df = load_classification_data()
+    print(f'Summary of Data: {df.info}')
+
+    text_clf = naive_bayes_classifier(df)
+
+    # Test Performance of Naive Bayes(NB) Classifier
+    predicted = text_clf.predict(df.data)
+    score = np.mean(predicted == df.category)
+    print(f'Accuracy: {score:.2f}')
+
+    # Store the model
+    filepath = 'res/classification_data/models/iris_model.sav'
+    pickle.dump(text_clf, open(filepath, 'wb'))
+    print('iris_model.sav Created.')
+
+    return text_clf
+
+
+# -----------------------------------------------------------------------
+# Main Functions
 def main():
+    global text_clf
     print("Reached main().")
 
     # Load user, create new one if needed
     user_obj = load_user("user.pickle")
+
+    # Load / Create Naive Bayes(NB) Classification Model
+    text_clf = None
+    try:
+        filepath = 'res/classification_data/models/iris_model.sav'
+        text_clf = pickle.load(open(filepath, 'rb'))
+        print("iris_model.sav Successfully Loaded.")
+    except:
+        print('Unable to Load iris_model.sav - Creating New Model')
+        text_clf = create_classification_model()
 
     # Start weather update thread
     weather_thread = threading.Thread(target=update_weather_label)
@@ -709,7 +783,6 @@ output_label.pack()
 input_field = ttk.Entry(input_frame)
 input_field.focus()  # Window will autofocus on Entry widget
 input_field.pack(side="left", padx=5, pady=10)
-
 input_field.bind('<Return>', set_output_text_key)
 
 # Add button to submit user input for processing
@@ -718,7 +791,7 @@ submit_button.pack(side="right", padx=5, pady=10)
 
 # Add toggle to turn on voice recognition
 stt_is_on = True
-microphone_icon = tk.PhotoImage(file="res/microphone_icon.png")
+microphone_icon = tk.PhotoImage(file="res/img/microphone_icon.png")
 stt_button = ttk.Button(input_frame, image=microphone_icon, width=4, command=toggle_stt)
 stt_button.pack(side="right", padx=5, pady=10)
 
