@@ -50,21 +50,18 @@ def naive_bayes_classifier(df):
     # Test Performance of NB Classifier (Detailed)
     i = 0
     test_list = []
-    limit = int(0.2 * df.size)
-
-    # Get a random sample to use so that each illness/disorder is tested
-    detailed_test_df = df.sample(frac=.20).reset_index()
-
+    shuffled_df = df.sample(frac=1)  # Get a random sample to use so that each illness/disorder is tested
     start_time = time.time()
-    print(f'Limit (20% of Data): {limit}')
-    for selftext in detailed_test_df.selftext:
-        pred = text_clf.predict(df.selftext)
+    for selftext in shuffled_df.selftext:
+        pred = text_clf.predict(shuffled_df.selftext)
+        actual = shuffled_df.category[i]
         time_elapsed = (time.time() - start_time) / 60
-        if pred[i] == df.category[i]:
+        if pred[i] == actual:
             result = 'PASS'
         else:
             result = 'FAIL'
-        test = f'ID: {i}/{limit} | Prediction: {pred[i]} | Result: {result} | Selftext: {selftext}'
+        test = f'ID: {i}/{len(shuffled_df)} | Prediction: {pred[i]} | Actual: {actual} ' \
+               f'| Result: {result} | Selftext: {selftext}'
         print(f'Time Elapsed: {time_elapsed:.2f}m | {test}')
         i = i + 1
 
@@ -79,7 +76,7 @@ def naive_bayes_classifier(df):
     test_df = pd.DataFrame(test_list, columns=['Results'])
     test_df.to_csv('data/test_results.csv', index=0)
     print("Detailed Testing Complete - test_results.csv created.")
-    print(f"Total Time Elaped: {total_time}")
+    print(f"Total Time Elaped: {total_time:.2f}m")
 
     # Test Performance of NB Classifier (General)
     predicted = text_clf.predict(df.selftext)
