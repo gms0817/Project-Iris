@@ -1,46 +1,116 @@
 # Imports
 import pandas as pd
-import matplotlib.pyplot as plt
+import numpy as np
+import time
 from sklearn.feature_extraction.text import CountVectorizer
-from sklearn.model_selection import train_test_split
-from sklearn.linear_model import LogisticRegression
-from sklearn.preprocessing import LabelEncoder
-from keras.models import Sequential
-from keras import layers
-from keras.backend import clear_session
+from sklearn.feature_extraction.text import TfidfTransformer
+from sklearn.naive_bayes import MultinomialNB
+from sklearn.pipeline import Pipeline
+from sklearn.linear_model import SGDClassifier
 
-# Configure Filepaths
-filepath_dict = {'anxiety': 'reddit-data/anxiety.csv',
-                 'depression': 'reddit-data/depression.csv',
-                 'tourettes': 'reddit-data/tourettes.csv'}
 
-df_list = []
+def load_data():
+    # Configure Filepaths
+    filepath_dict = {'anxiety': 'data/anxiety.csv',
+                     'depression': 'data/depression.csv',
+                     'tourettes': 'data/tourettes.csv'}
 
-# Create the master-set
-for source, filepath in filepath_dict.items():
-    df = pd.read_csv(filepath, names=['selftext'])
-    df = df[df.selftext.notnull()]  # Remove empty values
-    df = df[df.selftext != '']  # Remove empty strings
-    df = df[df.selftext != '[deleted]']  # Remove deleted status posts
-    df = df[df.selftext != '[removed]']  # Remove removed status posts
-    df['category'] = source  # Add category column
-    df_list.append(df)
+    df_list = []
 
-df = pd.concat(df_list)
-# print(f'Summary: {df.info}\nDescription: {df.describe()}\nShape: {df.shape}')
+    # Create the master-set
+    for source, filepath in filepath_dict.items():
+        df = pd.read_csv(filepath, names=['selftext'])
+        df = df[df.selftext.notnull()]  # Remove empty values
+        df = df[df.selftext != '']  # Remove empty strings
+        df = df[df.selftext != '[deleted]']  # Remove deleted status posts
+        df = df[df.selftext != '[removed]']  # Remove removed status posts
+        df['category'] = source  # Add category column
+        df_list.append(df)
 
-# Make master-set csv
-df.to_csv('reddit-data/master-set.csv', index=0)
-df.info()  # Get info on dataset
+    df = pd.concat(df_list)
+    print(f'Summary: {df.info}\nDescription: {df.describe()}\nShape: {df.shape}')
 
-# Create feature matrix using bag-of-words model
+    # Make master-set csv and save .csv file
+    df.to_csv('data/master-set.csv', index=0)
+
+    return df
+
+
+def naive_bayes_classifier(df):
+    # Extract features from files based on the 'bag-of-words' model
+    text_clf = Pipeline([('vect', CountVectorizer()),
+                         ('tfidf', TfidfTransformer()),
+                         ('clf', MultinomialNB())])
+    print("Features Extracted.")
+    print("Term Frequencies Extracted.")
+
+    # Run Naive Bayes(NB) ML Algorithm
+    text_clf = text_clf.fit(df.selftext, df.category)
+
+    # Test Performance of NB Classifier (Detailed)
+    i = 0
+    test_list = []
+    limit = int(0.2 * df.size)
+
+    # Get a random sample to use so that each illness/disorder is tested
+    detailed_test_df = df.sample(frac=.20).reset_index()
+
+    start_time = time.time()
+    print(f'Limit (20% of Data): {limit}')
+    for selftext in detailed_test_df.selftext:
+        pred = text_clf.predict(df.selftext)
+        time_elapsed = (time.time() - start_time) / 60
+        if pred[i] == df.category[i]:
+            result = 'PASS'
+        else:
+            result = 'FAIL'
+        test = f'ID: {i}/{limit} | Prediction: {pred[i]} | Result: {result} | Selftext: {selftext}'
+        print(f'Time Elapsed: {time_elapsed:.2f}m | {test}')
+        i = i + 1
+
+        # Store Test into list
+        test_list.append(test)
+
+        # Stop running at limit
+        if i == 5:
+            break
+    total_time = (time.time() - start_time) / 60
+    # Save test results to .csv
+    test_df = pd.DataFrame(test_list, columns=['Results'])
+    test_df.to_csv('data/test_results.csv', index=0)
+    print("Detailed Testing Complete - test_results.csv created.")
+    print(f"Total Time Elaped: {total_time}")
+
+    # Test Performance of NB Classifier (General)
+    predicted = text_clf.predict(df.selftext)
+    print(f'Predicted: {predicted}')
+    score = np.mean(predicted == df.category)
+    print(f'Average Performance (Naive Bayes): {score}.')
+    print("General Testing Complete.")
+
+
+
+def main():
+    print("Reached main().")
+    # Load and consolidate the datasets
+    df = load_data()
+    print("Loaded dataframe.")
+
+    # Run Naive Bayes(NB) Machine-learning Algorithm
+    naive_bayes_classifier(df)
+
+
+
+if __name__ == "__main__":
+    main()
+""""# Create feature matrix using bag-of-words model
 sentences = df['selftext'].values
 y = df['category'].values
 
 le = LabelEncoder()  # Convert strings to number format
 y = le.fit_transform(y)
 
-sentences_train, sentences_test, y_train, y_test = train_test_split(sentences, y, test_size=0.25, random_state=1000)
+sentences_train, sentences_test, y_train, y_test = train_test_split(sentences, y, test_size=0.20, random_state=10)
 
 # Create the training and test set using the vectorized data
 vectorizer = CountVectorizer()
@@ -54,9 +124,10 @@ classifier = LogisticRegression()
 classifier.fit(X_train, y_train)
 
 score = classifier.score(X_test, y_test)
+classifier.predict(y_test)
 print("Accuracy: ", score)
 
-# Keras Sequential Model
+# (Deep Learning) Keras Sequential Model
 input_dim = X_train.shape[1]  # Number of features
 
 # Create sequential model with TensorFlow background
@@ -108,7 +179,8 @@ print("Training Accuracy: {:.4f}".format(accuracy))
 loss, accuracy = model.evaluate(X_test, y_test, verbose=False)
 print("Testing Accuracy:  {:.4f}".format(accuracy))
 
+model.save('model.pkl')
 # Visualize the loss and accuracy for training and testing data
 plt.style.use('ggplot')
 
-plot_history(history)
+plot_history(history)"""
