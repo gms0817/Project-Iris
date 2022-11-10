@@ -50,7 +50,7 @@ def naive_bayes_classifier(df):
     # Test Performance of NB Classifier (Detailed)
     i = 0
     test_list = []
-    shuffled_df = df.sample(frac=1)  # Get a random sample to use so that each illness/disorder is tested
+    shuffled_df = df.sample(n=10)  # Get a random sample to use so that each illness/disorder is tested
     start_time = time.time()
     for selftext in shuffled_df.selftext:
         pred = text_clf.predict(shuffled_df.selftext)
@@ -60,7 +60,7 @@ def naive_bayes_classifier(df):
             result = 'PASS'
         else:
             result = 'FAIL'
-        test = f'ID: {i}/{len(shuffled_df)} | Prediction: {pred[i]} | Actual: {actual} ' \
+        test = f'ID: {i+1}/{len(shuffled_df)} | Prediction: {pred[i]} | Actual: {actual} ' \
                f'| Result: {result} | Selftext: {selftext}'
         print(f'Time Elapsed: {time_elapsed:.2f}m | {test}')
         i = i + 1
@@ -68,9 +68,6 @@ def naive_bayes_classifier(df):
         # Store Test into list
         test_list.append(test)
 
-        # Stop running at limit
-        if i == 5:
-            break
     total_time = (time.time() - start_time) / 60
     # Save test results to .csv
     test_df = pd.DataFrame(test_list, columns=['Results'])
