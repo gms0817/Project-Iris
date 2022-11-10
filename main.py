@@ -718,7 +718,7 @@ submit_button.pack(side="right", padx=5, pady=10)
 
 # Add toggle to turn on voice recognition
 stt_is_on = True
-microphone_icon = tk.PhotoImage(file="res/microphone_icon.png")
+microphone_icon = tk.PhotoImage(file="res/img/microphone_icon.png")
 stt_button = ttk.Button(input_frame, image=microphone_icon, width=4, command=toggle_stt)
 stt_button.pack(side="right", padx=5, pady=10)
 

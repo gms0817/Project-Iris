@@ -11,9 +11,9 @@ from sklearn.linear_model import SGDClassifier
 
 def load_data():
     # Configure Filepaths
-    filepath_dict = {'anxiety': 'data/anxiety.csv',
-                     'depression': 'data/depression.csv',
-                     'tourettes': 'data/tourettes.csv'}
+    filepath_dict = {'anxiety': 'classification_data/datasets/anxiety.csv',
+                     'depression': 'classification_data/datasets/depression.csv',
+                     'tourettes': 'classification_data/datasets/tourettes.csv'}
 
     df_list = []
 
@@ -31,7 +31,7 @@ def load_data():
     print(f'Summary: {df.info}\nDescription: {df.describe()}\nShape: {df.shape}')
 
     # Make master-set csv and save .csv file
-    df.to_csv('data/master-set.csv', index=0)
+    df.to_csv('classification_data/datasets/master-set.csv', index=0)
 
     return df
 
@@ -60,7 +60,7 @@ def naive_bayes_classifier(df):
             result = 'PASS'
         else:
             result = 'FAIL'
-        test = f'ID: {i+1}/{len(shuffled_df)} | Prediction: {pred[i]} | Actual: {actual} ' \
+        test = f'ID: {i + 1}/{len(shuffled_df)} | Prediction: {pred[i]} | Actual: {actual} ' \
                f'| Result: {result} | Selftext: {selftext}'
         print(f'Time Elapsed: {time_elapsed:.2f}m | {test}')
         i = i + 1
@@ -71,7 +71,7 @@ def naive_bayes_classifier(df):
     total_time = (time.time() - start_time) / 60
     # Save test results to .csv
     test_df = pd.DataFrame(test_list, columns=['Results'])
-    test_df.to_csv('data/test_results.csv', index=0)
+    test_df.to_csv('classification_data/datasets/test_results.csv', index=0)
     print("Detailed Testing Complete - test_results.csv created.")
     print(f"Total Time Elaped: {total_time:.2f}m")
 
@@ -83,7 +83,6 @@ def naive_bayes_classifier(df):
     print("General Testing Complete.")
 
 
-
 def main():
     print("Reached main().")
     # Load and consolidate the datasets
@@ -92,7 +91,6 @@ def main():
 
     # Run Naive Bayes(NB) Machine-learning Algorithm
     naive_bayes_classifier(df)
-
 
 
 if __name__ == "__main__":

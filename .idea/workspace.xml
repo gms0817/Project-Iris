@@ -4,9 +4,16 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="92160799-1fd0-4d6d-898a-1c0c20b32c3d" name="Changes" comment="- Added weather label to header which updates every 30 minutes">
+    <list default="true" id="92160799-1fd0-4d6d-898a-1c0c20b32c3d" name="Changes" comment="-Testing NaiveBayes for Iris">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/data/adhd.csv" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/data/anxiety.csv" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/data/depression.csv" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/data/master-set.csv" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/data/tourettes.csv" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ml.py" beforeDir="false" afterPath="$PROJECT_DIR$/ml.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/res/microphone_icon.png" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -19,7 +26,7 @@
   <component name="Git.Settings">
     <option name="RECENT_BRANCH_BY_REPOSITORY">
       <map>
-        <entry key="$PROJECT_DIR$" value="v3.0.0" />
+        <entry key="$PROJECT_DIR$" value="v3.1.0-NaiveBayes_Testing" />
       </map>
     </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
@@ -41,6 +48,11 @@
     &quot;settings.editor.selected.configurable&quot;: &quot;reference.settingsdialog.IDE.editor.colors.reStructuredText&quot;
   }
 }</component>
+  <component name="RecentsManager">
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="G:\My Drive\Programming\Python\Project-Iris\res\classification_data\datasets" />
+    </key>
+  </component>
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="TaskManager">
     <task active="true" id="Default" summary="Default task">
@@ -127,7 +139,14 @@
       <option name="project" value="LOCAL" />
       <updated>1667863643593</updated>
     </task>
-    <option name="localTasksCounter" value="12" />
+    <task id="LOCAL-00012" summary="-Testing NaiveBayes for Iris">
+      <created>1668098674894</created>
+      <option name="number" value="00012" />
+      <option name="presentableId" value="LOCAL-00012" />
+      <option name="project" value="LOCAL" />
+      <updated>1668098674894</updated>
+    </task>
+    <option name="localTasksCounter" value="13" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
