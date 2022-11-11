@@ -478,7 +478,7 @@ def switch_tts_voice(option):
     voices = engine.getProperty('voices')
     print(option)
     engine.setProperty('voice', voices[option].id)  # voices[0] == male, voices[1] == female
-
+    engine = pyttsx3()
 
 # -----------------------------------------------------------------------
 # Output Text Handler Functions
