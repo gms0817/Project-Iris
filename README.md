@@ -1,24 +1,21 @@
-# Project-Iris - v3.0.0
-Personal AI Companion 
-- v3.0.0 -> Rewrote Iris using Python rather than Java. This was done to make use of more modern and up-to-date libraries to allow for TTS, STT, etc.
-### Features added to Iris:
-- TTS with ability to choose from male voice and female voice
-- STT
-- Added exit handler to stop TTS process on program exit
-- Fixed Iris speaking before printing text. Now, Iris speaks AFTER output_text is updated.
-### Queries added to Iris: (20 total in v3.0.0)
-- Empty string query
-- Telling Time
-- Telling the date
-- Telling the user's birthday, name and zip
-- Telling iris' birthday
-- Telling iris' name
-- Telling who made Iris
-- Searching Google
-- Expressing Thanks based on user input
-- Expressing status to the user
-- Saying Hello and Goodbye
-- Describing the user (name, age, dob, zipcode, etc)
-- Telling the user how to spell words based on STT input
-- Telling the user their zodiac sign
-- Telling the user Iris' zodiac sign
+# Project-Iris - v3.1.0
+Personal AI Companion
+### Features/Fixes added to Iris:
+- Changed new user form to ask for City/town instead of zipcode in order to use weather api
+- Changed "STT" button to a microphone icon
+- Added 'Tools' menu
+- Added 'Reddit-Scraper' tool which accepts as input 'subreddit and number of posts'
+- (WIP) Adjusted reddit scrape too to request API keys before use
+- Added weather label to header which updates every 30 minutes
+  - runs on its own thread which executes while program is running
+- (WIP) Added 'User Settings' button to header to change/update user information
+- (WIP) Added a mini-mode to have Iris run in the background
+- (WIP) Added network requirement and handler for when there is no internet access
+- (WIP) Added voice-activation to iris so that the user does not have to click the STT toggle button
+### Queries added to Iris: (0 total in v3.1.0)
+- Tell user the weather based on city/town provided in new user form or based on input 
+  - (BUG)output needs adjusted for towns with more than one word names
+  - (BUG) Some locations are not returning uppercase 
+  - (BUG) Need to add exception handling for location input
+- (WIP) set an alarm
+- (WIP) set a reminder

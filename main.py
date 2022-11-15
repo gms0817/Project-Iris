@@ -1,10 +1,14 @@
 # -----------------------------------------------------------------------
 # Imports
+import os
 import pickle
+import string
 import threading
+import time
 import tkinter as tk
 import urllib
 import requests.exceptions
+import requests
 import sv_ttk
 import speech_recognition as sr
 import pyttsx3
@@ -12,13 +16,17 @@ import numpy as np
 import user
 import queue
 import atexit
+import praw
+import pandas as pd
 from tkinter import ttk
 from datetime import datetime
 from datetime import date
+from psaw import PushshiftAPI
 from requests_html import HTML
 from requests_html import HTMLSession
 from multiprocessing import Process
 from threading import Thread
+from bs4 import BeautifulSoup
 
 
 # -----------------------------------------------------------------------
@@ -52,16 +60,73 @@ class TTSThread(threading.Thread):
 
 
 # -----------------------------------------------------------------------
-# Setup On-Exit Handling
-def on_exit_app():
-    tts_queue.put("exit")
-
-
-atexit.register(on_exit_app)
-
-
-# -----------------------------------------------------------------------
 # Helper Functions
+def get_weather(city_name):
+    separator = city_name.rindex(' ')
+    state_name = city_name[separator:]
+    state_name.capitalize()
+    city_name = city_name[0:separator]
+    city_name.capitalize()
+    location = city_name + state_name
+    location = location.capitalize()
+    print(location)
+
+    # Create URL
+    url = "https://www.google.com/search?q=" + "weather" + location
+
+    # Request Instance
+    html = requests.get(url).content
+
+    # Get the raw data
+    soup = BeautifulSoup(html, 'html.parser')
+
+    # Get the temperature
+    temp = soup.find('div', attrs={'class': 'BNeawe iBp4i AP7Wnd'}).text
+
+    # Get the time and sky description
+    str = soup.find('div', attrs={'class': 'BNeawe tAd8D AP7Wnd'}).text
+
+    # Format the data
+    data = str.split('\n')
+    time = data[0]
+    sky = data[1]
+    output = f'It is currently {temp} degrees in {location}.'
+
+    return output
+
+
+def get_user_weather():
+    location = user_obj.user_city
+    # Create URL
+    url = "https://www.google.com/search?q=" + "weather" + location
+
+    # Request Instance
+    html = requests.get(url).content
+
+    # Get the raw data
+    soup = BeautifulSoup(html, 'html.parser')
+
+    # Get the temperature
+    temp = soup.find('div', attrs={'class': 'BNeawe iBp4i AP7Wnd'}).text
+
+    # Format the data
+    output = f'{temp} in {location}'
+
+    return output
+
+
+def update_weather_label():
+    i = 0
+    while True:
+        print("Temperature Updated.\n")
+        i = i + 1
+
+        temp = get_user_weather()
+        # temp = f"TEST-{i}"
+        weather_label.config(text=str(temp))
+        time.sleep(1800)  # Update Weather Label Every 1/2 Hour -> 60 * 60 = 3600 / 2 = 1800 seconds
+
+
 def spell_word(input_text):
     output = (input_text + " is spelled ")
 
@@ -125,16 +190,16 @@ def toggle_stt():
 
 def get_response(input_text):
     input_text = input_text.lower()
-    print("get_response(): " + input_text)
+    print("User -->" + input_text)
     # -----------------------------------------------------------------------
     # Pre-Defined Responses
     if len(input_text) == 0:
-        return np.random.choice(["How may I help you?","Sorry, I didn't get that. How may I help you?"])
+        return np.random.choice(["How may I help you?", "Sorry, I didn't get that. How may I help you?"])
     elif "time" in input_text:
         return get_time()
     elif "day is it" in input_text or "today" in input_text and "date" in input_text:
         return get_date()
-    # Use to Debug/Test TTS Pronounciation
+    # Use to Debug/Test TTS Pronunciation
     elif "@say " in input_text:
         return input_text[4:]
     # Thanks / Appreciation to Iris
@@ -199,6 +264,9 @@ def get_response(input_text):
     # What is the user's age
     elif "old am i" in input_text or "my age" in input_text:
         return "You are " + str(user_obj.user_age) + " years old."
+    # Where is the user from
+    elif "am i from" in input_text or "i live" in input_text:
+        return "You live in " + user_obj.user_city + "."
     # What is the users zodiac sign
     elif "my zodiac" in input_text or "my star sign" in input_text:
         return "Your Zodiac sign is '" + get_zodiac() + "'."
@@ -207,6 +275,15 @@ def get_response(input_text):
         start_of_word = input_text.rindex("spell") + 6
         word = input_text[start_of_word:len(input_text)]
         return spell_word(word)
+    # Weather at specific town
+    elif "weather in" in input_text or "weather at" in input_text:
+        start_index = input_text.index("in") + 2
+        location = input_text[start_index:]
+        return get_weather(location)
+    # Weather Outside
+    elif "weather outside" in input_text or "weather today" in input_text or "the weather" in input_text:
+        location = user_obj.user_city
+        return get_weather(location)
     # Google Search
     elif "look up" in input_text or "lookup" in input_text or "google" in input_text or "search":
         return google_search(input_text)
@@ -214,6 +291,120 @@ def get_response(input_text):
     else:
         return "I'm sorry. I do not understand."
     # AI Generated Responses - WIP
+
+
+# -----------------------------------------------------------------------
+# Reddit Scraping
+def reddit_scraper_popup():
+    # Scrape Reddit Based on User Input
+    def scrape_reddit(subreddit_input, num_of_posts):
+        # Initialize PushshiftAPI
+        api = PushshiftAPI()
+
+        # Update Status Label
+        status_label.config(text="Scraping...")
+
+        # Remove r/ if user puts it in
+        if "/r" in subreddit_input:
+            subreddit_input = subreddit_input[2:]
+        print("Subreddit: " + subreddit_input)  # For debugging
+
+        # Collect integer from num_of_posts input
+        if "all" in num_of_posts:
+            num_of_posts = None
+        else:
+            num_of_posts = int(num_of_posts)
+        print("Number of Posts: " + str(num_of_posts))  # For debugging
+
+        # Read-only instance of scraper
+        reddit = praw.Reddit(client_id="RVwOTqiFJbXKWzeHRztGHQ",
+                             client_secret="cg70MVjFpakehf6k-zwCXXim0KymfA",
+                             user_agent="GmS_11702")
+
+        subreddit = subreddit_input
+        start_year = 2021
+        end_year = 2022
+
+        # Directory to store data
+        directory = './reddit-data/'
+        if not os.path.exists(directory):
+            os.makedirs(directory)
+
+        # Initialize time-stamps to define timeframe of posts
+        ts_after = int(datetime(start_year, 1, 1).timestamp())
+        ts_before = int(datetime(end_year + 1, 1, 1).timestamp())
+
+        submissions_dict = {
+            "title": [],
+            "selftext": []
+        }
+
+        # Use PSAW to get ID of submissions based on time interval
+        gen = api.search_submissions(
+            after=ts_after,
+            before=ts_before,
+            filter=['id'],
+            subreddit=subreddit,
+            limit=num_of_posts
+        )
+
+        # Use PRAW to get submission information
+        submission_count = 0
+        start_time = time.time()
+        for submission_psaw in gen:
+            time_elapsed = str(time.time() - start_time)
+            submission_count = submission_count + 1
+            # Use psaw
+            submission_id = submission_psaw.d_['id']
+
+            # Use praw
+            submission_praw = reddit.submission(id=submission_id)
+
+            # Add submission data to submissions dictionary
+            submissions_dict["title"].append(submission_praw.title)
+            submissions_dict["selftext"].append(submission_praw.selftext)
+            print(
+                f"Elapsed Time: {(time.time() - start_time) / 60: .2f}m | Submission Number: " + str(submission_count))
+        print(submissions_dict)
+        # Save scraped data to csv
+        pd.DataFrame(submissions_dict).to_csv(directory + subreddit + '.csv', index=False)
+
+    # -----------------------------------------------------------------------
+    # Create popup window
+    reddit_scraper = tk.Toplevel(root)
+    reddit_scraper.geometry(f'{400}x{400}+{center_x + 160}+{center_y}')
+    reddit_scraper.focus()
+
+    # Tool Title
+    title_label = ttk.Label(reddit_scraper, text="Reddit Scraper")
+    title_label.pack(padx=10, pady=15)
+
+    # Subreddit to Scrape
+    subreddit_label = ttk.Label(reddit_scraper, text="What subreddit do you want to scrape?")
+    subreddit_label.pack(padx=10, pady=10)
+
+    subreddit_field = ttk.Entry(reddit_scraper, width=25)
+    subreddit_field.pack(padx=10, pady=10)
+
+    # Number of Posts to Scrape
+    num_of_posts_label = ttk.Label(reddit_scraper, text="How many posts would you like to scrape?")
+    num_of_posts_label.pack(padx=10, pady=10)
+
+    num_of_posts_field = ttk.Entry(reddit_scraper, width=25)
+    num_of_posts_field.pack(padx=10, pady=10)
+
+    # Choose a file path to save the .csv
+
+    # Status Label
+    status_label = ttk.Label(reddit_scraper, text="Waiting...")
+    status_label.pack(padx=10, pady=10)
+
+    # Submit Button
+    reddit_submit_button = ttk.Button(reddit_scraper,
+                                      text="Scrape",
+                                      command=lambda: [status_label.config(text="Scraping..."),
+                                                       scrape_reddit(subreddit_field.get(), num_of_posts_field.get())])
+    reddit_submit_button.pack(padx=10, pady=10)
 
 
 # -----------------------------------------------------------------------
@@ -268,6 +459,7 @@ def google_search(query):
 
 
 # -----------------------------------------------------------------------
+# STT/TTS Functions
 def speech_to_text():
     recognizer = sr.Recognizer()
     with sr.Microphone() as mic:
@@ -277,7 +469,6 @@ def speech_to_text():
         text = recognizer.recognize_google(audio)
         print("me --> ", text)
         set_output_text_voice(text)
-        tts_queue.put(output)
     except Exception as e:
         print(e)
 
@@ -287,7 +478,7 @@ def switch_tts_voice(option):
     voices = engine.getProperty('voices')
     print(option)
     engine.setProperty('voice', voices[option].id)  # voices[0] == male, voices[1] == female
-
+    engine = pyttsx3()
 
 # -----------------------------------------------------------------------
 # Output Text Handler Functions
@@ -313,6 +504,8 @@ def set_output_text_key(self):
     tts_queue.put(output)
 
 
+# -----------------------------------------------------------------------
+# User Handling Functions
 def new_user_popup():
     # Create popup window
     new_user_window = tk.Toplevel(root)
@@ -341,39 +534,39 @@ def new_user_popup():
     user_dob_field = ttk.Entry(new_user_window, width=25)
     user_dob_field.pack(padx=10, pady=10)
 
-    # User Zipcode
-    zipcode_label = ttk.Label(
+    # User City/Town
+    city_label = ttk.Label(
         new_user_window,
-        text="Enter your zip-code:\n(Required for location services.)")
-    zipcode_label.pack(padx=10, pady=10)
+        text="Enter your City and State Abbreviation:\n(Required for location services.)\n")
+    city_label.pack(padx=10, pady=10)
 
-    zipcode_field = ttk.Entry(new_user_window, width=25)
-    zipcode_field.pack(padx=10, pady=10)
+    city_field = ttk.Entry(new_user_window, width=25)
+    city_field.pack(padx=10, pady=10)
 
     # Add submit button to create new user with data provided
     new_user_submit_button = ttk.Button(
         new_user_window, text="Create User",
         command=lambda: create_user_obj(user_name_field.get(),
-                                        user_dob_field.get(), zipcode_field.get()))
+                                        user_dob_field.get(), city_field.get()))
     new_user_submit_button.pack(padx=10, pady=10, side="bottom")
 
-    def create_user_obj(user_name, user_dob, user_zipcode):
+    def create_user_obj(user_name, user_dob, user_city):
         # Check for properly formatted input
         # Name is not checked in case people want to use usernames instead
         # Conditionals
         dob_pass = False
-        zipcode_pass = False
+        city_pass = False
 
         # Check DOB Format
         if datetime.strptime(user_dob, '%Y-%m-%d'):
             dob_pass = True
 
-        # Check Zipcode Format
-        if len(user_zipcode) == 5 and user_zipcode.isnumeric():
-            zipcode_pass = True
+        # Check City/Town Format
+        if not user_city.isnumeric():
+            city_pass = True
 
         # Final Check on All Conditions
-        if dob_pass and zipcode_pass:
+        if dob_pass and city_pass:
             # Calculate Age from DOB
             dob_components = user_dob.split('-')
             year, month, day = [int(item) for item in dob_components]
@@ -381,7 +574,7 @@ def new_user_popup():
 
             # Create user_obj
             global user_obj
-            user_obj = user.User(user_name, user_dob, user_age, user_zipcode)
+            user_obj = user.User(user_name, user_dob, user_age, user_city)
             save_user(user_obj)  # Save user as an object to a pickle file
             output = "It is nice to meet you, " + user_obj.user_name + ". How may I help you?"
             output_label.config(text=output)
@@ -392,7 +585,7 @@ def new_user_popup():
             print("User created: "
                   + user_obj.user_name + " "
                   + str(user_obj.user_dob) + " "
-                  + str(user_obj.user_zipcode) + " ")
+                  + str(user_obj.user_city) + " ")
             close_new_user_popup() """
         else:
             print("Error: Incorrect Formatting")
@@ -406,7 +599,6 @@ def new_user_popup():
 def load_user(filename):
     global user_obj
     try:
-        print(filename)
         with open(filename, "rb") as f:
             user_obj = pickle.load(f)
             output = "Welcome back, " + user_obj.user_name + "."
@@ -433,8 +625,31 @@ def create_user():
 
 
 # -----------------------------------------------------------------------
+# Setup On-Exit Handling
+def on_exit_app():
+    tts_queue.put("exit")
+
+
+# -----------------------------------------------------------------------
+# main Functions
+def main():
+    print("Reached main().")
+
+    # Load user, create new one if needed
+    user_obj = load_user("user.pickle")
+
+    # Start weather update thread
+    weather_thread = threading.Thread(target=update_weather_label)
+    weather_thread.start()
+
+    # Initialize Exit Handling
+    atexit.register(on_exit_app)
+
+
+# -----------------------------------------------------------------------
 # Build the user interface
 # Create instance of tk.Tk class to create application window and style
+print("Launching Iris...")
 root = tk.Tk()  # Main window
 root.title('Iris: Your Personal Assistant')
 
@@ -467,6 +682,7 @@ input_frame = ttk.Frame(footer_frame)
 input_frame.pack()
 
 # Add menu bar to header
+# Add voices menu to header
 voice_menu_button = ttk.Menubutton(header_frame, text="Voices ")
 menu = tk.Menu(voice_menu_button, tearoff=0)
 menu.add_radiobutton(label="David", value="David", command=lambda: switch_tts_voice(0))
@@ -474,6 +690,16 @@ menu.add_radiobutton(label="Zika", value="Zika", command=lambda: switch_tts_voic
 voice_menu_button["menu"] = menu
 voice_menu_button.pack(side="left", padx=10, pady=10)
 
+# Add Tools menu to header
+tools_menu_button = ttk.Menubutton(header_frame, text="Tools ")
+tools_menu = tk.Menu(tools_menu_button, tearoff=0)
+tools_menu.add_command(label="Reddit Scraper", command=reddit_scraper_popup)
+tools_menu_button["menu"] = tools_menu
+tools_menu_button.pack(side="left", padx=10, pady=10)
+
+# Add weather to header
+weather_label = ttk.Label(header_frame)
+weather_label.pack(side='right', padx=10, pady=10)
 # Add label to display output
 output_label = ttk.Label(body_frame, text="Hi, my name is Iris. How may I help you?", wraplength=500, justify="center",
                          font=("Arial", 20))
@@ -492,7 +718,8 @@ submit_button.pack(side="right", padx=5, pady=10)
 
 # Add toggle to turn on voice recognition
 stt_is_on = True
-stt_button = ttk.Button(input_frame, text="STT", width=4, command=toggle_stt)
+microphone_icon = tk.PhotoImage(file="res/img/microphone_icon.png")
+stt_button = ttk.Button(input_frame, image=microphone_icon, width=4, command=toggle_stt)
 stt_button.pack(side="right", padx=5, pady=10)
 
 # Set Sun Valley TTK Theme
@@ -508,12 +735,12 @@ tts_queue = queue.Queue()
 tts_thread = TTSThread(tts_queue)  # Auto-starting thread
 print("TTS Thread Started.")
 
-# -----------------------------------------------------------------------
-# Load user, create new one if needed
-global user_obj
-user_obj = load_user("user.pickle")
+print("Iris has successfully launched.")
 
-# Keeps window visible on the screen until program is closed
-root.mainloop()
+if __name__ == "__main__":
+    main()
+
+    # Keeps window visible on the screen until program is closed
+    root.mainloop()
 
 # -----------------------------------------------------------------------
