@@ -36,7 +36,7 @@ def load_data():
     return df
 
 
-def naive_bayes_classifier(df):
+def detailed_naive_bayes_classifier(df):
     # Extract features from files based on the 'bag-of-words' model
     text_clf = Pipeline([('vect', CountVectorizer()),
                          ('tfidf', TfidfTransformer()),
@@ -74,6 +74,18 @@ def naive_bayes_classifier(df):
     test_df.to_csv('classification_data/datasets/test_results.csv', index=0)
     print("Detailed Testing Complete - test_results.csv created.")
     print(f"Total Time Elaped: {total_time:.2f}m")
+
+
+def naive_bayes_classifier(df):
+    # Extract features from files based on the 'bag-of-words' model
+    text_clf = Pipeline([('vect', CountVectorizer()),
+                         ('tfidf', TfidfTransformer()),
+                         ('clf', MultinomialNB())])
+    print("Features Extracted.")
+    print("Term Frequencies Extracted.")
+
+    # Run Naive Bayes(NB) ML Algorithm
+    text_clf = text_clf.fit(df.selftext, df.category)
 
     # Test Performance of NB Classifier (General)
     predicted = text_clf.predict(df.selftext)
