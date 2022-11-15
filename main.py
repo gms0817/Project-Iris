@@ -326,7 +326,7 @@ def reddit_scraper_popup():
         end_year = 2022
 
         # Directory to store data
-        directory = './reddit-data/'
+        directory = 'res/classification_data/datasets'
         if not os.path.exists(directory):
             os.makedirs(directory)
 
