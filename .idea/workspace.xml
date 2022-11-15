@@ -4,8 +4,10 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="92160799-1fd0-4d6d-898a-1c0c20b32c3d" name="Changes" comment="-fix">
+    <list default="true" id="92160799-1fd0-4d6d-898a-1c0c20b32c3d" name="Changes" comment="-separated detailed and general nb classification function">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ml.py" beforeDir="false" afterPath="$PROJECT_DIR$/ml.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/res/classification_data/datasets/master-set.csv" beforeDir="false" afterPath="$PROJECT_DIR$/res/classification_data/datasets/master-set.csv" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -145,7 +147,14 @@
       <option name="project" value="LOCAL" />
       <updated>1668098985957</updated>
     </task>
-    <option name="localTasksCounter" value="14" />
+    <task id="LOCAL-00014" summary="-separated detailed and general nb classification function">
+      <created>1668522809906</created>
+      <option name="number" value="00014" />
+      <option name="presentableId" value="LOCAL-00014" />
+      <option name="project" value="LOCAL" />
+      <updated>1668522809906</updated>
+    </task>
+    <option name="localTasksCounter" value="15" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -172,6 +181,7 @@
     <MESSAGE value="-added weather query" />
     <MESSAGE value="- Added weather label to header which updates every 30 minutes" />
     <MESSAGE value="-fix" />
-    <option name="LAST_COMMIT_MESSAGE" value="-fix" />
+    <MESSAGE value="-separated detailed and general nb classification function" />
+    <option name="LAST_COMMIT_MESSAGE" value="-separated detailed and general nb classification function" />
   </component>
 </project>

@@ -1,7 +1,9 @@
 # Imports
+import matplotlib.pyplot as plt
 import pandas as pd
 import numpy as np
 import time
+import seaborn as sns
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.feature_extraction.text import TfidfTransformer
 from sklearn.naive_bayes import MultinomialNB
@@ -11,9 +13,9 @@ from sklearn.linear_model import SGDClassifier
 
 def load_data():
     # Configure Filepaths
-    filepath_dict = {'anxiety': 'classification_data/datasets/anxiety.csv',
-                     'depression': 'classification_data/datasets/depression.csv',
-                     'tourettes': 'classification_data/datasets/tourettes.csv'}
+    filepath_dict = {'anxiety': 'res/classification_data/datasets/anxiety.csv',
+                     'depression': 'res/classification_data/datasets/depression.csv',
+                     'tourettes': 'res/classification_data/datasets/tourettes.csv'}
 
     df_list = []
 
@@ -28,10 +30,10 @@ def load_data():
         df_list.append(df)
 
     df = pd.concat(df_list)
-    print(f'Summary: {df.info}\nDescription: {df.describe()}\nShape: {df.shape}')
+    print(f'5 Samples: {df.head()}\n| Summary: \n{df.info}\nDescription: {df.describe()}\nShape: {df.shape}')
 
     # Make master-set csv and save .csv file
-    df.to_csv('classification_data/datasets/master-set.csv', index=0)
+    df.to_csv('res/classification_data/datasets/master-set.csv', index=0)
 
     return df
 
@@ -50,7 +52,7 @@ def detailed_naive_bayes_classifier(df):
     # Test Performance of NB Classifier (Detailed)
     i = 0
     test_list = []
-    shuffled_df = df.sample(n=10)  # Get a random sample to use so that each illness/disorder is tested
+    shuffled_df = df.sample(frac=20)  # Get a random sample to use so that each illness/disorder is tested
     start_time = time.time()
     for selftext in shuffled_df.selftext:
         pred = text_clf.predict(shuffled_df.selftext)
@@ -87,12 +89,64 @@ def naive_bayes_classifier(df):
     # Run Naive Bayes(NB) ML Algorithm
     text_clf = text_clf.fit(df.selftext, df.category)
 
-    # Test Performance of NB Classifier (General)
+    # Testing accuracy and populate dicts to use to plot
+    i, pass_count, fail_count = 0, 0, 0
+    pass_score_dict = []
+    fail_score_dict = []
+
+    # Manual Performance Measuring of NB Classifier
+    for selftext in df.selftext:
+        pred = text_clf.predict([selftext])
+        actual = df.category[i]
+        print(f'Prediction: {pred} | Actual:{actual} | SelfText: {selftext}')
+
+        # Populate pass/fail lists
+        if pred == actual:
+            pass_count = pass_count + 1
+        else:
+            fail_count = fail_count + 1
+        pass_score = pass_count / len(df)
+        pass_score_dict.append(pass_score)
+
+        fail_score = fail_count / len(df)
+        fail_score_dict.append(fail_score)
+
+        print(f'Pass Score: {pass_score} | Fail Score: {fail_score}')
+
+        i = i + 1
+
+    # Plot performance
+    plt.rcParams['figure.figsize'] = [7.5, 3.5]
+    plt.rcParams['figure.autolayout'] = True
+
+    # Pass Performance
+    pass_score_dict = np.array(pass_score_dict)
+    x = np.arange(0, len(pass_score_dict))
+    y = pass_score_dict
+    plt.plot(x, y, color="blue", label="Pass")
+
+    # Fail performance
+    fail_score_dict = np.array(fail_score_dict)
+    x_fail = np.arange(0, len(fail_score_dict))
+    y_fail = fail_score_dict
+    plt.plot(x_fail, y_fail, color="red", label="Fail")
+
+    # Customize Scatter Plot
+    plt.title("NB Classifier Accuracy")
+    plt.xlabel("Number of Samples")
+    plt.ylabel("Accuracy (%)")
+    plt.legend()
+
+    plt.show()
+
+    # General Performance Measuring of NB Classifier
     predicted = text_clf.predict(df.selftext)
     print(f'Predicted: {predicted}')
     score = np.mean(predicted == df.category)
-    print(f'Average Performance (Naive Bayes): {score}.')
+    print(f'Average Performance (Naive Bayes): {score:.3f}%')
     print("General Testing Complete.")
+
+    return text_clf
 
 
 def main():
@@ -102,7 +156,15 @@ def main():
     print("Loaded dataframe.")
 
     # Run Naive Bayes(NB) Machine-learning Algorithm
-    naive_bayes_classifier(df)
+    text_clf = naive_bayes_classifier(df)
+
+    test1 = "I have been feeling really sad recently and i am not sure what to do"
+    pred1 = text_clf.predict([test1])
+
+    test2 = "I'm so stressed and anxious all the time and i dont know whats going on"
+    pred2 = text_clf.predict([test2])
+    print(f'Prediction: {pred1} | Test 1: {test1}')
+    print(f'Prediction: {pred2} | Test 2: {test2}')
 
 
 if __name__ == "__main__":
