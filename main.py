@@ -183,11 +183,6 @@ def calculate_age(dob):
     return age
 
 
-# Enables speech recognition and translates speech into text
-def toggle_stt():
-    speech_to_text()
-
-
 def get_response(input_text):
     input_text = input_text.lower()
     print("User -->" + input_text)
@@ -248,7 +243,7 @@ def get_response(input_text):
         year = 2021
         month = 10
         day = 21
-        return "I am " + str(calculate_age(date(year, month, day))) + " year(s) old."
+        return "I am " + str(calculate_age(date(year, month, day))) + " years old."
     # Iris' Zodiac
     elif "your zodiac" in input_text or "your star sign" in input_text:
         return "I am a Libra."
@@ -285,8 +280,16 @@ def get_response(input_text):
         location = user_obj.user_city
         return get_weather(location)
     # Google Search
-    elif "look up" in input_text or "lookup" in input_text or "google" in input_text or "search":
+    elif "look up" in input_text or "lookup" in input_text or "google" in input_text or "search" in input_text:
         return google_search(input_text)
+    # Open Reddit Scraper
+    elif 'reddit scrape' in input_text and ('open' in input_text or 'launch' in input_text):
+        reddit_scraper_popup()
+        return 'Launching Reddit Scraper.'
+    # Close Reddit Scraper
+    elif 'reddit scrape' in input_text and 'close' in input_text:
+        reddit_scraper.destroy()
+        return 'Successfully closed Reddit Scraper.'
     # No Response
     else:
         return "I'm sorry. I do not understand."
@@ -322,7 +325,7 @@ def reddit_scraper_popup():
                              user_agent="GmS_11702")
 
         subreddit = subreddit_input
-        start_year = 2021
+        start_year = 2012
         end_year = 2022
 
         # Directory to store data
@@ -365,9 +368,10 @@ def reddit_scraper_popup():
             submissions_dict["selftext"].append(submission_praw.selftext)
             print(
                 f"Elapsed Time: {(time.time() - start_time) / 60: .2f}m | Submission Number: " + str(submission_count))
+
+            # Save scraped data to csv
+            pd.DataFrame(submissions_dict).to_csv(directory + subreddit + '-' + str(num_of_posts) + '.csv', index=False)
         print(submissions_dict)
-        # Save scraped data to csv
-        pd.DataFrame(submissions_dict).to_csv(directory + subreddit + '.csv', index=False)
 
     # -----------------------------------------------------------------------
     # Create popup window
@@ -462,15 +466,26 @@ def google_search(query):
 # STT/TTS Functions
 def speech_to_text():
     recognizer = sr.Recognizer()
-    with sr.Microphone() as mic:
-        print("listening...")
-        audio = recognizer.listen(mic)
-    try:
-        text = recognizer.recognize_google(audio)
-        print("me --> ", text)
-        set_output_text_voice(text)
-    except Exception as e:
-        print(e)
+    action_phrase = "iris"
+    while True:
+        with sr.Microphone() as mic:
+            audio = recognizer.record(mic, duration=5)
+            try:
+                text = recognizer.recognize_google(audio)
+                print("Voice Input: ", text)
+
+            except Exception as e:
+                print('Voice Input: None')
+                print(e)
+        if action_phrase in text.lower():
+            print('Calling set_output_text_voice()')
+            try:
+                set_output_text_voice(text[4:])
+            except Exception:
+                error_output = 'Im sorry, I do not understand'
+                output_label.config(text=error_output)
+                tts_queue.put(error_output)
+            text = ""
 
 
 def switch_tts_voice(option):
@@ -479,6 +494,7 @@ def switch_tts_voice(option):
     print(option)
     engine.setProperty('voice', voices[option].id)  # voices[0] == male, voices[1] == female
     engine = pyttsx3()
+
 
 # -----------------------------------------------------------------------
 # Output Text Handler Functions
@@ -716,12 +732,6 @@ input_field.bind('<Return>', set_output_text_key)
 submit_button = ttk.Button(input_frame, text="Submit", width=8, command=set_output_text)
 submit_button.pack(side="right", padx=5, pady=10)
 
-# Add toggle to turn on voice recognition
-stt_is_on = True
-microphone_icon = tk.PhotoImage(file="res/img/microphone_icon.png")
-stt_button = ttk.Button(input_frame, image=microphone_icon, width=4, command=toggle_stt)
-stt_button.pack(side="right", padx=5, pady=10)
-
 # Set Sun Valley TTK Theme
 # Sun Valley TTK Theme by rdbende
 sv_ttk.set_theme("dark")
@@ -735,7 +745,18 @@ tts_queue = queue.Queue()
 tts_thread = TTSThread(tts_queue)  # Auto-starting thread
 print("TTS Thread Started.")
 
+# -----------------------------------------------------------------------
+# Setup and Start STT Thread
+stt_thread = Thread(target=speech_to_text)
+stt_thread.daemon = True
+stt_thread.start()
+print('STT Thread Started.')
+
 print("Iris has successfully launched.")
+
+# -----------------------------------------------------------------------
+# Pre-Setup Windows/Popups
+reddit_scraper = None
 
 if __name__ == "__main__":
     main()
